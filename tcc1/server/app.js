@@ -3,7 +3,7 @@ import { randomBytes } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ensureJsonFile } from "./json-store.js";
+import { createMessageRepository, MessageValidationError } from "./messages.js";
 import { createUserRepository, ConflictError, publicUser, ValidationError } from "./users.js";
 import { createSessionStore, readCookies, serializeSessionCookie, SESSION_COOKIE } from "./sessions.js";
 
@@ -31,13 +31,14 @@ export async function createConnectClassApp(options = {}) {
   const usersFile = join(dataDirectory, "usuarios.json");
   const messagesFile = join(dataDirectory, "mensagens.json");
   const users = createUserRepository(usersFile);
+  const messages = createMessageRepository(messagesFile);
   const sessions = createSessionStore({
     regularTtlMs: options.regularSessionTtlMs ?? REGULAR_SESSION_TTL,
     rememberedTtlMs: options.rememberedSessionTtlMs ?? REMEMBERED_SESSION_TTL,
   });
 
   await users.initialize();
-  await ensureJsonFile(messagesFile, { mensagens: [] });
+  await messages.initialize();
 
   const generatedManagerPassword =
     options.managerPassword ?? process.env.CONNECTCLASS_GESTOR_PASSWORD ?? generateTemporaryPassword();
@@ -51,7 +52,7 @@ export async function createConnectClassApp(options = {}) {
 
   const server = createServer(async (request, response) => {
     try {
-      await handleRequest({ request, response, users, sessions, publicDirectory, isProduction });
+      await handleRequest({ request, response, users, messages, sessions, publicDirectory, isProduction });
     } catch (error) {
       console.error("[ConnectClass] Erro inesperado:", error);
       sendJson(response, 500, { message: "Não foi possível concluir a operação. Tente novamente." });
@@ -88,6 +89,14 @@ async function handleRequest(context) {
     return protectedApi(context, "gestor");
   }
 
+  if (request.method === "GET" && url.pathname === "/api/mensagens") {
+    return listStudentMessages(context, url);
+  }
+
+  if (request.method === "POST" && url.pathname === "/api/mensagens") {
+    return createStudentMessage(context);
+  }
+
   if (request.method === "GET" && url.pathname === "/aluno") {
     return protectedPage(context, "aluno", "index.html");
   }
@@ -101,6 +110,41 @@ async function handleRequest(context) {
   }
 
   sendJson(response, 404, { message: "Rota não encontrada." });
+}
+
+async function listStudentMessages(context, url) {
+  const user = await authenticatedUser(context);
+  if (!user) return sendJson(context.response, 401, { message: "Não autenticado." });
+  if (user.tipo !== "aluno") return sendJson(context.response, 403, { message: "Acesso negado." });
+
+  try {
+    const mensagens = await context.messages.listForStudent(user.id, {
+      categoria: url.searchParams.get("categoria") ?? "todos",
+      busca: url.searchParams.get("busca") ?? "",
+    });
+    return sendJson(context.response, 200, { mensagens });
+  } catch (error) {
+    return sendKnownError(context.response, error);
+  }
+}
+
+async function createStudentMessage(context) {
+  const { request, response } = context;
+  if (!hasAllowedOrigin(request)) {
+    return sendJson(response, 403, { message: "Origem da requisição não permitida." });
+  }
+
+  const user = await authenticatedUser(context);
+  if (!user) return sendJson(response, 401, { message: "Não autenticado." });
+  if (user.tipo !== "aluno") return sendJson(response, 403, { message: "Acesso negado." });
+
+  try {
+    const body = await readRequestBody(request);
+    const mensagem = await context.messages.createForStudent(user, body);
+    return sendJson(response, 201, { mensagem });
+  } catch (error) {
+    return sendKnownError(response, error);
+  }
 }
 
 async function handleRegistration(context) {
@@ -195,6 +239,9 @@ function sendKnownError(response, error) {
   }
   if (error instanceof RequestBodyError) {
     return sendJson(response, 400, { message: error.message });
+  }
+  if (error instanceof MessageValidationError) {
+    return sendJson(response, 422, { message: error.message });
   }
 
   console.error("[ConnectClass] Erro de requisição:", error);

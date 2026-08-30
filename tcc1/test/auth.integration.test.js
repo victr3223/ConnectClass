@@ -200,6 +200,106 @@ test("usuários e a estrutura de mensagens sobrevivem ao reinício do servidor",
   }
 });
 
+test("aluno cria histórico persistente e recebe somente suas próprias mensagens", async () => {
+  const application = await startApplication();
+  try {
+    const firstStudent = await request(application, "/api/auth/register", {
+      method: "POST",
+      body: validStudent(),
+    });
+    const secondStudent = await request(application, "/api/auth/register", {
+      method: "POST",
+      body: validStudent({
+        nome: "Bruno Alves",
+        ra: "2026002",
+        email: "bruno.alves@escola.edu.br",
+      }),
+    });
+
+    const firstMessage = await request(application, "/api/mensagens", {
+      method: "POST",
+      cookie: firstStudent.cookie,
+      body: { categoria: "perguntas", mensagem: "Quando será divulgada a agenda escolar?", alunoId: 999, status: "Resolvida" },
+    });
+    assert.equal(firstMessage.status, 201);
+    assert.equal(firstMessage.body.mensagem.alunoId, firstStudent.body.user.id);
+    assert.equal(firstMessage.body.mensagem.status, "Pendente");
+    assert.equal(firstMessage.body.mensagem.tipo, "Pergunta");
+
+    const secondMessage = await request(application, "/api/mensagens", {
+      method: "POST",
+      cookie: firstStudent.cookie,
+      body: { categoria: "reclamacoes", mensagem: "A internet do laboratório está instável." },
+    });
+    assert.equal(secondMessage.status, 201);
+
+    const foreignMessage = await request(application, "/api/mensagens", {
+      method: "POST",
+      cookie: secondStudent.cookie,
+      body: { categoria: "sugestoes", mensagem: "Sugiro ampliar o horário da biblioteca." },
+    });
+    assert.equal(foreignMessage.status, 201);
+
+    const history = await request(application, "/api/mensagens", { cookie: firstStudent.cookie });
+    assert.equal(history.status, 200);
+    assert.deepEqual(history.body.mensagens.map((message) => message.id), [secondMessage.body.mensagem.id, firstMessage.body.mensagem.id]);
+    assert.equal(history.body.mensagens.some((message) => message.id === foreignMessage.body.mensagem.id), false);
+
+    const filteredHistory = await request(application, "/api/mensagens?categoria=perguntas&busca=agenda", {
+      cookie: firstStudent.cookie,
+    });
+    assert.equal(filteredHistory.status, 200);
+    assert.deepEqual(filteredHistory.body.mensagens.map((message) => message.id), [firstMessage.body.mensagem.id]);
+
+    const storedMessages = JSON.parse(await readFile(application.messagesFile, "utf8"));
+    assert.equal(storedMessages.mensagens.length, 3);
+    assert.deepEqual(storedMessages.mensagens[0].respostas, []);
+  } finally {
+    await application.close();
+  }
+});
+
+test("API de mensagens exige aluno autenticado e valida conteúdo e categoria", async () => {
+  const application = await startApplication();
+  try {
+    const unauthenticated = await request(application, "/api/mensagens", {
+      method: "POST",
+      body: { categoria: "perguntas", mensagem: "Teste" },
+    });
+    assert.equal(unauthenticated.status, 401);
+
+    const student = await request(application, "/api/auth/register", { method: "POST", body: validStudent() });
+    const blank = await request(application, "/api/mensagens", {
+      method: "POST",
+      cookie: student.cookie,
+      body: { categoria: "perguntas", mensagem: "   " },
+    });
+    assert.equal(blank.status, 422);
+    assert.equal(blank.body.message, "Não é possível enviar uma mensagem vazia.");
+
+    const invalidCategory = await request(application, "/api/mensagens", {
+      method: "POST",
+      cookie: student.cookie,
+      body: { categoria: "administracao", mensagem: "Teste" },
+    });
+    assert.equal(invalidCategory.status, 422);
+    assert.equal(invalidCategory.body.message, "Categoria inválida.");
+
+    const manager = await request(application, "/api/auth/login", {
+      method: "POST",
+      body: { identidade: "gestor@connectclass.local", senha: application.managerPassword },
+    });
+    const managerPost = await request(application, "/api/mensagens", {
+      method: "POST",
+      cookie: manager.cookie,
+      body: { categoria: "perguntas", mensagem: "Teste" },
+    });
+    assert.equal(managerPost.status, 403);
+  } finally {
+    await application.close();
+  }
+});
+
 function listen(server) {
   return new Promise((resolve, reject) => {
     server.once("error", reject);

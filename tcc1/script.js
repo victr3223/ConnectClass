@@ -1,39 +1,18 @@
 "use strict";
 
-// As conversas abaixo preservam temporariamente o layout do protótipo. Elas serão
-// substituídas pelos dados reais do backend na Fase 2.
-const FALLBACK_DATA = {
-  brand: { name: "ConnectClass", portal: "Portal do Aluno" },
-  student: { name: "Ana Maria Santos", classroom: "3º Ano - Turma B" },
-  categories: [
-    { id: "perguntas", label: "Perguntas", icon: "question" },
-    { id: "reclamacoes", label: "Reclamações", icon: "complaint" },
-    { id: "sugestoes", label: "Sugestões", icon: "idea" },
-  ],
-  conversations: {
-    perguntas: [
-      { id: "question-1", text: "Olá! Gostaria de saber quando será divulgado o calendário de provas do segundo bimestre?", sender: "student", timestamp: "09:15", status: "Respondida" },
-      { id: "question-2", text: "Bom dia! O calendário de provas será divulgado na próxima sexta-feira, dia 12/06. Você receberá uma notificação por e-mail e também poderá consultar no portal do aluno.", sender: "secretary", timestamp: "09:32" },
-      { id: "question-3", text: "Perfeito! Muito obrigado pela resposta rápida.", sender: "student", timestamp: "09:35", status: "Concluída" },
-      { id: "question-4", text: "Disponha! Estamos à disposição para ajudar. 😊", sender: "secretary", timestamp: "09:36" },
-    ],
-    reclamacoes: [
-      { id: "complaint-1", text: "Gostaria de relatar que a internet da biblioteca está muito lenta nos últimos dias, o que tem dificultado o acesso aos materiais de pesquisa.", sender: "student", timestamp: "14:20", status: "Em análise" },
-      { id: "complaint-2", text: "Obrigado pelo relato. Já encaminhamos sua solicitação para o setor de TI. Eles vão verificar o problema e fazer os ajustes necessários nos próximos dias.", sender: "secretary", timestamp: "14:45" },
-      { id: "complaint-3", text: "Entendido. Quando houver uma solução, vocês podem me avisar?", sender: "student", timestamp: "14:50", status: "Respondida" },
-    ],
-    sugestoes: [
-      { id: "idea-1", text: "Sugiro que a escola disponibilize mais opções vegetarianas e veganas na cantina. Muitos alunos têm essas preferências alimentares.", sender: "student", timestamp: "11:00", status: "Em análise" },
-      { id: "idea-2", text: "Que ótima sugestão! Vamos encaminhar para a coordenação pedagógica e a empresa responsável pela cantina. Agradecemos pelo feedback construtivo!", sender: "secretary", timestamp: "11:25" },
-    ],
-  },
-};
+const CATEGORIES = [
+  { id: "perguntas", label: "Perguntas", icon: "question", type: "Pergunta" },
+  { id: "reclamacoes", label: "Reclamações", icon: "complaint", type: "Reclamação" },
+  { id: "sugestoes", label: "Sugestões", icon: "idea", type: "Sugestão" },
+];
 
 const state = {
-  data: null,
   student: null,
-  conversations: {},
+  messages: [],
   currentCategory: "perguntas",
+  historyCategory: "todos",
+  search: "",
+  loadingMessages: false,
 };
 
 const elements = {
@@ -45,6 +24,8 @@ const elements = {
   forgotSuccess: document.querySelector("#forgotSuccess"),
   categoryNav: document.querySelector("#categoryNav"),
   categoryTitle: document.querySelector("#categoryTitle"),
+  historyFilter: document.querySelector("#historyFilter"),
+  historySearch: document.querySelector("#historySearch"),
   messageList: document.querySelector("#messageList"),
   messageForm: document.querySelector("#messageForm"),
   messageInput: document.querySelector("#messageInput"),
@@ -61,9 +42,6 @@ const elements = {
 document.addEventListener("DOMContentLoaded", initialize);
 
 async function initialize() {
-  state.data = clone(FALLBACK_DATA);
-  state.conversations = clone(state.data.conversations);
-  state.currentCategory = state.data.categories[0]?.id || "perguntas";
   bindEvents();
   const user = await getCurrentUser();
   if (user) {
@@ -87,6 +65,14 @@ function bindEvents() {
   elements.forgotForm.addEventListener("submit", handleForgotPassword);
   elements.messageForm.addEventListener("submit", handleMessageSubmit);
   elements.messageInput.addEventListener("input", updateSendButton);
+  elements.historyFilter.addEventListener("change", () => {
+    state.historyCategory = elements.historyFilter.value;
+    loadMessageHistory();
+  });
+  elements.historySearch.addEventListener("input", debounce(() => {
+    state.search = elements.historySearch.value.trim();
+    loadMessageHistory();
+  }, 250));
 
   elements.mobileMenuButton.addEventListener("click", () => {
     toggleMobileMenu(!elements.sidebar.classList.contains("is-open"));
@@ -238,9 +224,10 @@ function enterAuthenticatedArea(user) {
 function showPortal() {
   elements.authScreen.hidden = true;
   elements.portalScreen.hidden = false;
+  populateHistoryFilter();
   renderProfile();
   renderNavigation();
-  renderConversation();
+  loadMessageHistory();
   requestAnimationFrame(() => elements.messageInput.focus());
 }
 
@@ -252,7 +239,7 @@ function showLogin() {
 function renderNavigation() {
   elements.categoryNav.replaceChildren();
 
-  state.data.categories.forEach((category) => {
+  CATEGORIES.forEach((category) => {
     const button = document.createElement("button");
     const isActive = category.id === state.currentCategory;
     button.type = "button";
@@ -266,10 +253,9 @@ function renderNavigation() {
 }
 
 function setCategory(categoryId) {
-  if (!Object.hasOwn(state.conversations, categoryId)) return;
+  if (!CATEGORIES.some((category) => category.id === categoryId)) return;
   state.currentCategory = categoryId;
   renderNavigation();
-  renderConversation();
   toggleMobileMenu(false);
 }
 
@@ -279,9 +265,47 @@ function renderProfile() {
   elements.studentAvatar.textContent = initials(state.student.name);
 }
 
+function populateHistoryFilter() {
+  elements.historyFilter.replaceChildren();
+  [{ id: "todos", label: "Todos os assuntos" }, ...CATEGORIES].forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category.id;
+    option.textContent = category.label;
+    elements.historyFilter.append(option);
+  });
+  elements.historyFilter.value = state.historyCategory;
+}
+
+async function loadMessageHistory() {
+  if (state.loadingMessages) return;
+  state.loadingMessages = true;
+  elements.messageList.setAttribute("aria-busy", "true");
+
+  try {
+    const params = new URLSearchParams({ categoria: state.historyCategory });
+    if (state.search) params.set("busca", state.search);
+    const response = await fetch(`/api/mensagens?${params}`, { cache: "no-store", credentials: "same-origin" });
+    const payload = await response.json().catch(() => ({}));
+    if (response.status === 401) {
+      showLogin();
+      return;
+    }
+    if (!response.ok) throw new ApiError(payload.message || "Não foi possível carregar seu histórico.");
+    state.messages = payload.mensagens;
+    renderConversation();
+  } catch (error) {
+    state.messages = [];
+    renderConversation();
+    showToast(error.message || "Não foi possível carregar seu histórico.");
+  } finally {
+    state.loadingMessages = false;
+    elements.messageList.removeAttribute("aria-busy");
+  }
+}
+
 function renderConversation() {
-  const category = state.data.categories.find((item) => item.id === state.currentCategory);
-  const messages = state.conversations[state.currentCategory] || [];
+  const category = CATEGORIES.find((item) => item.id === state.currentCategory);
+  const messages = state.messages;
 
   elements.categoryTitle.textContent = category?.label || "Conversa";
   elements.messageList.replaceChildren();
@@ -300,20 +324,24 @@ function renderConversation() {
 }
 
 function createMessage(message) {
-  const isStudent = message.sender === "student";
   const row = document.createElement("article");
-  row.className = `message-row message-row--${isStudent ? "student" : "secretary"}`;
+  row.className = "message-row message-row--student";
 
   const group = document.createElement("div");
   group.className = "message-group";
 
   const bubble = document.createElement("div");
   bubble.className = "message-bubble";
-  bubble.textContent = message.text;
+  bubble.textContent = message.mensagem;
   group.append(bubble);
 
   const meta = document.createElement("div");
   meta.className = "message-meta";
+
+  const category = document.createElement("span");
+  category.className = "message-category";
+  category.textContent = message.tipo;
+  meta.append(category);
 
   if (message.status) {
     const status = document.createElement("span");
@@ -323,7 +351,8 @@ function createMessage(message) {
   }
 
   const time = document.createElement("time");
-  time.textContent = message.timestamp;
+  time.dateTime = message.dataHora;
+  time.textContent = formatDateTime(message.dataHora);
   meta.append(time);
 
   group.append(meta);
@@ -345,27 +374,24 @@ function createEmptyState() {
   return stateElement;
 }
 
-function handleMessageSubmit(event) {
+async function handleMessageSubmit(event) {
   event.preventDefault();
   const text = elements.messageInput.value.trim();
   if (!text) return;
 
-  const message = {
-    id: `student-${Date.now()}`,
-    text,
-    sender: "student",
-    timestamp: new Intl.DateTimeFormat("pt-BR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date()),
-    status: "Em análise",
-  };
-
-  state.conversations[state.currentCategory].push(message);
-  elements.messageInput.value = "";
-  updateSendButton();
-  renderConversation();
-  elements.messageInput.focus();
+  setMessageFormBusy(true);
+  try {
+    await requestApi("/api/mensagens", { categoria: state.currentCategory, mensagem: text });
+    elements.messageInput.value = "";
+    updateSendButton();
+    await loadMessageHistory();
+    showToast("Mensagem enviada para a secretaria.");
+    elements.messageInput.focus();
+  } catch (error) {
+    showToast(error.message);
+  } finally {
+    setMessageFormBusy(false);
+  }
 }
 
 function updateSendButton() {
@@ -427,8 +453,9 @@ function initials(name) {
 
 function statusClass(status) {
   const statusMap = {
+    Pendente: "status--pendente",
     Respondida: "status--respondida",
-    Concluída: "status--concluida",
+    Resolvida: "status--resolvida",
     "Em análise": "status--em-analise",
   };
   return statusMap[status] || "";
@@ -451,10 +478,6 @@ function escapeHtml(value) {
     "'": "&#39;",
     '"': "&quot;",
   })[character]);
-}
-
-function clone(value) {
-  return JSON.parse(JSON.stringify(value));
 }
 
 async function getCurrentUser() {
@@ -516,6 +539,28 @@ function setFormBusy(form, busy) {
   form.querySelectorAll("input, button").forEach((element) => {
     element.disabled = busy;
   });
+}
+
+function setMessageFormBusy(busy) {
+  elements.messageInput.disabled = busy;
+  elements.sendButton.disabled = busy || !elements.messageInput.value.trim();
+}
+
+function formatDateTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Data indisponível";
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(date);
+}
+
+function debounce(callback, wait) {
+  let timeoutId;
+  return (...args) => {
+    window.clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => callback(...args), wait);
+  };
 }
 
 class ApiError extends Error {

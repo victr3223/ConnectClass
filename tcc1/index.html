@@ -251,6 +251,13 @@
             <div class="online-status"><span></span>Online</div>
           </header>
 
+          <section class="history-controls" aria-label="Buscar e filtrar histórico">
+            <label class="sr-only" for="historySearch">Buscar mensagens</label>
+            <input id="historySearch" type="search" autocomplete="off" placeholder="Buscar no histórico..." />
+            <label class="sr-only" for="historyFilter">Filtrar por categoria</label>
+            <select id="historyFilter" aria-label="Filtrar por categoria"></select>
+          </section>
+
           <section id="messageList" class="message-list" aria-live="polite" aria-label="Mensagens da conversa"></section>
 
           <footer class="message-composer">
