@@ -24,9 +24,6 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=12
-    defaults:
-      run:
-        working-directory: tcc1
     steps:
       - uses: actions/checkout@v7
         with:
@@ -35,14 +32,14 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: npm
-          cache-dependency-path: tcc1/package-lock.json
+          cache-dependency-path: package-lock.json
       - run: npm ci --ignore-scripts
       - name: Prepare isolated MySQL schemas and least-privilege test account
         run: node scripts/setup-ci-db.js
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
-          DB_NAME: connectclass_test
+          DB_NAME: connectclass_final_test
           DB_USER: root
           DB_PASSWORD: ci-root-fixture-only
           CI_DB_PASSWORD: ci-app-fixture-only
@@ -51,6 +48,6 @@ jobs:
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
-          DB_NAME: connectclass_test
-          DB_USER: connectclass_test
+          DB_NAME: connectclass_final_test
+          DB_USER: connectclass_final_test
           DB_PASSWORD: ci-app-fixture-only

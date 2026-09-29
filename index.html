@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="ConnectClass — portal de comunicação entre alunos e secretaria escolar."
+    />
+    <title>ConnectClass | Portal do aluno</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <section id="authScreen" class="auth-screen" aria-label="Acesso ao ConnectClass">
+        <aside class="auth-brand" aria-label="Apresentação do ConnectClass">
+          <div class="brand-orb brand-orb--top" aria-hidden="true"></div>
+          <div class="brand-orb brand-orb--middle" aria-hidden="true"></div>
+          <div class="brand-orb brand-orb--bottom" aria-hidden="true"></div>
+
+          <div class="auth-brand__content">
+            <img class="auth-symbol-image" src="/assets/logo.png" alt="Símbolo ConnectClass" />
+
+            <div class="connectclass-logo connectclass-logo--auth" role="img" aria-label="ConnectClass">
+              <span class="cc-logo-wordmark"><span class="cc-logo-connect">Connect</span><span class="cc-logo-class">Class</span></span>
+            </div>
+
+            <p class="brand-tagline">Conectando alunos e secretaria de forma simples e eficiente.</p>
+
+            <ul class="benefit-list" aria-label="Benefícios do ConnectClass">
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.75 8.25h-2.5A2.25 2.25 0 0 0 2 10.5v7.25A2.25 2.25 0 0 0 4.25 20h7.25a2.25 2.25 0 0 0 2.25-2.25v-2.5M9 15.5h7.75A2.25 2.25 0 0 0 19 13.25V6A2.25 2.25 0 0 0 16.75 3.75H9A2.25 2.25 0 0 0 6.75 6v7.25A2.25 2.25 0 0 0 9 15.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M10 10h5M10 13h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                <span>Comunicação direta e rápida</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 7 3.25v5.2c0 4.23-2.8 7.96-7 9.05-4.2-1.09-7-4.82-7-9.05v-5.2L12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m8.8 11.9 2.05 2.05 4.35-4.35" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Ambiente seguro e confiável</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.5v5l3.25 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Acompanhe suas mensagens e respostas</span>
+              </li>
+            </ul>
+          </div>
+        </aside>
+
+        <main class="auth-main">
+          <div class="mobile-brand" aria-label="ConnectClass">
+            <div class="connectclass-logo connectclass-logo--mobile" role="img" aria-label="ConnectClass">
+              <span class="cc-logo-icon" aria-hidden="true">
+                <span class="cc-bubble cc-bubble--back">
+                  <span class="cc-line cc-line--back-1"></span>
+                  <span class="cc-line cc-line--back-2"></span>
+                  <span class="cc-dot cc-dot--back"></span>
+                </span>
+                <span class="cc-bubble cc-bubble--front">
+                  <span class="cc-line cc-line--front-1"></span>
+                  <span class="cc-line cc-line--front-2"></span>
+                  <span class="cc-dot cc-dot--front"></span>
+                  <span class="cc-mini-line"></span>
+                </span>
+              </span>
+              <span class="cc-logo-wordmark"><span class="cc-logo-connect">Connect</span><span class="cc-logo-class">Class</span></span>
+            </div>
+          </div>
+
+          <div class="auth-stack">
+            <section class="auth-card" aria-live="polite">
+              <form id="loginForm" class="auth-form" novalidate>
+                <header class="form-heading">
+                  <h1>Bem-vindo ao ConnectClass</h1>
+                  <p>Acesse sua conta para continuar</p>
+                </header>
+
+                <div class="form-field">
+                  <label for="loginIdentity">RA ou E-mail</label>
+                  <div class="input-shell">
+                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.15" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 20v-2.1A4.9 4.9 0 0 1 10.4 13h3.2a4.9 4.9 0 0 1 4.9 4.9V20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                    <input id="loginIdentity" name="identity" type="text" autocomplete="username" placeholder="Ex: 2024001 ou aluno@escola.edu.br" />
+                  </div>
+                  <small class="field-error" data-error-for="loginIdentity"></small>
+                </div>
+
+                <div class="form-field">
+                  <label for="loginPassword">Senha</label>
+                  <div class="input-shell">
+                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5.2" y="10" width="13.6" height="10" rx="1.7" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                    <input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="Sua senha" />
+                    <button class="password-toggle" type="button" data-password-toggle="loginPassword" aria-label="Mostrar senha">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2.75 12s3.2-5 9.25-5 9.25 5 9.25 5-3.2 5-9.25 5-9.25-5-9.25-5Z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="2.35" stroke="currentColor" stroke-width="1.7"/></svg>
+                    </button>
+                  </div>
+                  <small class="field-error" data-error-for="loginPassword"></small>
+                </div>
+
+                <div class="form-options">
+                  <label class="remember-option" for="rememberMe">
+                    <input id="rememberMe" name="remember" type="checkbox" />
+                    <span class="custom-checkbox" aria-hidden="true"></span>
+                    <span>Lembrar-me</span>
+                  </label>
+                  <button class="text-button" type="button" data-auth-view="forgot">Esqueci minha senha</button>
+                </div>
+
+                <button class="primary-button" type="submit">
+                  <span>Entrar</span>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <p class="form-helper">Use suas credenciais cadastradas para acessar.</p>
+
+                <div class="form-divider"><span>ou</span></div>
+                <button class="secondary-button" type="button" data-auth-view="register">Criar Conta</button>
+              </form>
+
+              <form id="registerForm" class="auth-form is-hidden" novalidate>
+                <button class="back-link" type="button" data-auth-view="login">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span>Voltar ao login</span>
+                </button>
+                <header class="form-heading form-heading--compact">
+                  <h1>Criar Conta</h1>
+                  <p>Preencha os dados abaixo para se cadastrar</p>
+                </header>
+
+                <div class="form-field">
+                  <label for="registerName">Nome Completo</label>
+                  <div class="input-shell">
+                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.15" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 20v-2.1A4.9 4.9 0 0 1 10.4 13h3.2a4.9 4.9 0 0 1 4.9 4.9V20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                    <input id="registerName" name="name" type="text" autocomplete="name" placeholder="Ex: Ana Maria Santos" />
+                  </div>
+                  <small class="field-error" data-error-for="registerName"></small>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-field">
+                    <label for="registerRa">RA</label>
+                    <div class="input-shell">
+                      <svg class="field-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4 7 20M17 4l-2 16M4 9h16M3 15h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                      <input id="registerRa" name="ra" type="text" inputmode="numeric" placeholder="Ex: 2024001" />
+                    </div>
+                    <small class="field-error" data-error-for="registerRa"></small>
+                  </div>
+                  <div class="form-field">
+                    <label for="registerClass">Série/Turma</label>
+                    <div class="input-shell">
+                      <svg class="field-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.5 9.5 12 5l8.5 4.5L12 14 3.5 9.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M6.7 11.2v3.4c0 1.15 2.37 2.15 5.3 2.15s5.3-1 5.3-2.15v-3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                      <input id="registerClass" name="classroom" type="text" placeholder="Ex: 3º Ano B" />
+                    </div>
+                    <small class="field-error" data-error-for="registerClass"></small>
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label for="registerEmail">E-mail Institucional</label>
+                  <div class="input-shell">
+                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="m4.5 7 7.5 5.65L19.5 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <input id="registerEmail" name="email" type="email" autocomplete="email" placeholder="Ex: ana.santos@escola.edu.br" />
+                  </div>
+                  <small class="field-error" data-error-for="registerEmail"></small>
+                </div>
+
+                <div class="form-field">
+                  <label for="registerPassword">Senha</label>
+                  <div class="input-shell">
+                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5.2" y="10" width="13.6" height="10" rx="1.7" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                    <input id="registerPassword" name="password" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" />
+                    <button class="password-toggle" type="button" data-password-toggle="registerPassword" aria-label="Mostrar senha">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2.75 12s3.2-5 9.25-5 9.25 5 9.25 5-3.2 5-9.25 5-9.25-5-9.25-5Z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="2.35" stroke="currentColor" stroke-width="1.7"/></svg>
+                    </button>
+                  </div>
+                  <small class="field-error" data-error-for="registerPassword"></small>
+                </div>
+
+                <div class="form-field">
+                  <label for="registerConfirmPassword">Confirmar Senha</label>
+                  <div class="input-shell">
+                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5.2" y="10" width="13.6" height="10" rx="1.7" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                    <input id="registerConfirmPassword" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Repita sua senha" />
+                    <button class="password-toggle" type="button" data-password-toggle="registerConfirmPassword" aria-label="Mostrar senha">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2.75 12s3.2-5 9.25-5 9.25 5 9.25 5-3.2 5-9.25 5-9.25-5-9.25-5Z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="2.35" stroke="currentColor" stroke-width="1.7"/></svg>
+                    </button>
+                  </div>
+                  <small class="field-error" data-error-for="registerConfirmPassword"></small>
+                </div>
+
+                <button class="primary-button" type="submit">
+                  <span>Cadastrar</span>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </form>
+
+              <form id="forgotForm" class="auth-form is-hidden" novalidate>
+                <button class="back-link" type="button" data-auth-view="login">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span>Voltar ao login</span>
+                </button>
+                <header class="form-heading form-heading--compact">
+                  <h1>Recuperar senha</h1>
+                  <p>Para recuperar o acesso, procure a secretaria escolar com seu RA. A recuperação por e-mail ainda não está disponível.</p>
+                </header>
+                <div class="form-field">
+                  <label for="forgotEmail">E-mail Institucional</label>
+                  <div class="input-shell">
+                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="m4.5 7 7.5 5.65L19.5 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <input id="forgotEmail" name="email" type="email" autocomplete="email" placeholder="Ex: aluno@escola.edu.br" />
+                  </div>
+                  <small class="field-error" data-error-for="forgotEmail"></small>
+                </div>
+                <button class="primary-button" type="submit">
+                  <span>Ver orientação de acesso</span>
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <p id="forgotSuccess" class="success-note" hidden></p>
+              </form>
+            </section>
+            <p class="auth-footer">© 2026 ConnectClass · Plataforma Escolar Digital</p>
+          </div>
+        </main>
+      </section>
+
+      <section id="portalScreen" class="portal-screen" aria-label="Portal do aluno" hidden>
+        <button id="mobileMenuButton" class="mobile-menu-button" type="button" aria-controls="portalSidebar" aria-expanded="false" aria-label="Abrir menu">
+          <span></span><span></span><span></span>
+        </button>
+        <div id="sidebarOverlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+        <aside id="portalSidebar" class="portal-sidebar">
+          <div class="sidebar-brand">
+            <div class="connectclass-logo connectclass-logo--sidebar" role="img" aria-label="ConnectClass">
+              <span class="cc-logo-icon" aria-hidden="true">
+                <span class="cc-bubble cc-bubble--back">
+                  <span class="cc-line cc-line--back-1"></span>
+                  <span class="cc-line cc-line--back-2"></span>
+                  <span class="cc-dot cc-dot--back"></span>
+                </span>
+                <span class="cc-bubble cc-bubble--front">
+                  <span class="cc-line cc-line--front-1"></span>
+                  <span class="cc-line cc-line--front-2"></span>
+                  <span class="cc-dot cc-dot--front"></span>
+                  <span class="cc-mini-line"></span>
+                </span>
+              </span>
+              <span class="cc-logo-wordmark"><span class="cc-logo-connect">Connect</span><span class="cc-logo-class">Class</span></span>
+            </div>
+            <div>
+              <h1 class="sr-only">ConnectClass</h1>
+              <p>Portal do Aluno</p>
+            </div>
+          </div>
+
+          <nav id="categoryNav" class="category-nav" aria-label="Categorias de atendimento"></nav>
+
+          <div class="student-profile">
+            <div id="studentAvatar" class="student-avatar" aria-hidden="true"></div>
+            <div>
+              <strong id="studentName"></strong>
+              <span id="studentClass"></span>
+            </div>
+          </div>
+          <button id="studentLogoutButton" class="sidebar-logout" type="button">Sair da conta</button>
+        </aside>
+
+        <main class="chat-shell">
+          <header class="chat-header">
+            <div>
+              <h2>Secretaria Escolar</h2>
+              <p id="categoryTitle">Perguntas</p>
+            </div>
+            <button id="studentRefreshButton" class="history-refresh" type="button">Atualizar</button>
+          </header>
+
+          <section class="history-controls" aria-label="Buscar no histórico atual">
+            <label class="sr-only" for="historySearch">Buscar mensagens</label>
+            <input id="historySearch" type="search" autocomplete="off" placeholder="Buscar no histórico..." />
+          </section>
+
+          <section id="messageList" class="message-list" aria-live="polite" aria-label="Mensagens da conversa"></section>
+
+          <footer class="message-composer">
+            <form id="messageForm" class="composer-form">
+              <label class="sr-only" for="messageInput">Digite sua mensagem</label>
+              <input id="messageInput" type="text" maxlength="1000" autocomplete="off" placeholder="Digite sua pergunta..." />
+              <button id="sendButton" class="send-button" type="submit" aria-label="Enviar mensagem" disabled>
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m21 3-7.25 18-3.4-7.35L3 10.25 21 3Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="m10.35 13.65 4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <span>Enviar</span>
+              </button>
+            </form>
+          </footer>
+        </main>
+      </section>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="/message-ui.js" defer></script>
+    <script src="script.js" defer></script>
+  </body>
+</html>

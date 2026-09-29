@@ -14,10 +14,9 @@ Thumbs.db
 
 # Local workspace guidance and historical machine-specific evidence.
 /AGENTS.md
-/tcc1/.github/agents/
-/tcc1/docs/relatorio-final-producao.md
-/tcc1/docs/relatorio-migracao-mysql.md
-/tcc1/docs/validacao-mysql-20260926.txt
-/tcc1/database/private/
-/tcc1/data.json
-/tcc1/data/*.json
+/.github/agents/
+/database/private/
+/data.json
+/data/*.json
+/data/*.tmp
+/.vscode/

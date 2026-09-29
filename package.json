@@ -1,0 +1,26 @@
+{
+  "name": "connectclass",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node scripts/check.js",
+    "test": "node scripts/run-tests.js",
+    "test:unit": "node --test test/server.unit.test.js test/manager-ui.test.js",
+    "test:integration": "node --test --test-concurrency=1 test/auth.integration.test.js test/mysql.integration.test.js test/process.integration.test.js",
+    "test:e2e:http": "node --test test/process.integration.test.js",
+    "test:coverage": "node scripts/run-tests.js --coverage",
+    "verify": "npm run check && npm test",
+    "db:init": "node --env-file=.env.mysql-admin scripts/init-db.js",
+    "db:import": "node scripts/migrate-json-to-mysql.js",
+    "db:verify-import": "node scripts/verify-migration.js",
+    "db:setup-local": "node --env-file=.env.mysql-admin scripts/setup-local-db.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "mysql2": "3.24.4"
+  }
+}

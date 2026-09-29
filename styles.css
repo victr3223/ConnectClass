@@ -1,0 +1,2257 @@
+/* Define variáveis globais de cores, sombras, raios de borda, fonte e cores-base usadas em todo o sistema. */
+:root {
+  --navy-950: #0f1f5c;
+  --navy-900: #1e3a8a;
+  --navy-800: #244397;
+  --blue-700: #1d4ed8;
+  --blue-600: #2563eb;
+  --blue-300: #93c5fd;
+  --blue-100: #dbeafe;
+  --ink-950: #101828;
+  --ink-800: #1f2937;
+  --ink-700: #344054;
+  --ink-500: #667085;
+  --ink-400: #98a2b3;
+  --line: #e4e7ec;
+  --canvas: #f8fafc;
+  --white: #ffffff;
+  --shadow-card: 0 16px 26px rgba(16, 24, 40, 0.11), 0 3px 6px rgba(16, 24, 40, 0.05);
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  color: var(--ink-950);
+  background: var(--canvas);
+}
+
+/* Faz todos os elementos usarem `border-box`, facilitando o cálculo de largura e altura. */
+* {
+  box-sizing: border-box;
+}
+
+/* Garante altura mínima para a página inteira e remove a margem padrão do navegador. */
+html,
+body,
+.app-shell {
+  min-height: 100%;
+  margin: 0;
+}
+
+/* Define largura mínima, cores de fundo e texto e melhora a renderização das fontes da página. */
+body {
+  min-width: 320px;
+  background: var(--canvas);
+  color: var(--ink-950);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Faz botões e campos de formulário herdarem a mesma fonte usada no restante da aplicação. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* Mostra o cursor de clique quando o usuário passa sobre qualquer botão. */
+button {
+  cursor: pointer;
+}
+
+/* Cria um contorno visível de acessibilidade quando botões ou campos recebem foco pelo teclado. */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.26);
+  outline-offset: 2px;
+}
+
+/* Cria um pequeno efeito de pressionamento enquanto um botão está sendo clicado. */
+button:active {
+  transform: scale(0.985);
+}
+
+/* Garante que qualquer elemento marcado com o atributo `hidden` fique realmente oculto. */
+[hidden] {
+  display: none !important;
+}
+
+/* Esconde visualmente um conteúdo sem removê-lo dos leitores de tela, ajudando na acessibilidade. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Authentication */
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a tela de autenticação. */
+.auth-screen {
+  display: grid;
+  grid-template-columns: 45.1% 1fr;
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a área visual da marca na autenticação. */
+.auth-brand {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100svh;
+  overflow: hidden;
+  padding: 48px 28px;
+  color: var(--white);
+  background: linear-gradient(135deg, var(--navy-950) 0%, var(--navy-900) 48%, var(--blue-700) 100%);
+}
+
+/* Cria um elemento visual auxiliar em a área visual da marca na autenticação sem precisar adicionar outro elemento no HTML. */
+.auth-brand::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  opacity: 0.15;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #c9dcff 2.25px, transparent 2.55px);
+  background-position: 16px 38px;
+  background-size: 116px 128px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de os círculos decorativos da área da marca. */
+.brand-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  pointer-events: none;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o círculo decorativo superior da marca. */
+.brand-orb--top {
+  top: -80px;
+  left: -80px;
+  width: 258px;
+  height: 258px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o círculo decorativo central da marca. */
+.brand-orb--middle {
+  right: -43px;
+  top: calc(50% - 4px);
+  width: 178px;
+  height: 178px;
+  background: rgba(92, 159, 255, 0.12);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o círculo decorativo inferior da marca. */
+.brand-orb--bottom {
+  right: -68px;
+  bottom: -68px;
+  width: 328px;
+  height: 328px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o conteúdo central da marca. */
+.auth-brand__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(100%, 322px);
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: brand-enter 600ms ease-out both;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o símbolo da marca. */
+.brand-symbol {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a versão grande do símbolo da marca. */
+.brand-symbol--large {
+  width: 96px;
+  height: 96px;
+  margin-bottom: 24px;
+  color: var(--white);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 26px rgba(7, 18, 69, 0.22);
+  backdrop-filter: blur(8px);
+}
+
+/* Ajusta os ícones SVG exibidos dentro de a versão grande do símbolo da marca. */
+.brand-symbol--large svg {
+  width: 52px;
+  height: 44px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o logotipo escrito da marca. */
+.brand-wordmark {
+  width: 232px;
+  height: auto;
+  margin: -14px 0 -6px;
+  vertical-align: top;
+  padding-bottom: 100px;
+
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a frase de destaque da marca. */
+.brand-tagline {
+  max-width: 308px;
+  margin: 0;
+  color: #eef5ff;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.36;
+}
+
+/* Logo ConnectClass em HTML + CSS — mesma identidade em todas as páginas. */
+.connectclass-logo {
+  --cc-font-size: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  background: transparent;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* O símbolo de balões foi removido em todas as versões da marca. */
+.connectclass-logo .cc-logo-icon {
+  display: none;
+}
+
+/* Palavra ConnectClass: mesma aparência em login, cadastro, aluno e gestor. */
+.cc-logo-wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  font-size: var(--cc-font-size);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  paint-order: stroke fill;
+  text-shadow: 0 3px 8px rgba(6, 18, 68, 0.24);
+}
+
+/* Connect permanece branco em todas as páginas. A borda azul-marinho mantém a leitura até sobre fundo claro. */
+.cc-logo-connect {
+  color: #ffffff;
+  -webkit-text-stroke: 0.9px rgba(8, 24, 83, 0.9);
+}
+
+/* Class usa o mesmo azul-claro em toda a aplicação. */
+.cc-logo-class {
+  color: #2563eb;
+}
+
+/* Ícone PNG exibido acima do nome ConnectClass na tela de login/cadastro.
+   A imagem fica maior e mais próxima do título para formar um conjunto único. */
+.auth-symbol-image {
+  display: block;
+  width: 150px;
+  height: 92px;
+  object-fit: cover;
+  object-position: center;
+  margin: 0 auto -4px;
+  background: transparent;
+}
+
+/* Logo grande da tela de login/cadastro. */
+.connectclass-logo--auth {
+  --cc-font-size: 44px;
+  margin: 0 auto 24px;
+}
+
+/* Logo da autenticação em telas pequenas. Mantém exatamente as mesmas cores. */
+.connectclass-logo--mobile {
+  --cc-font-size: 22px;
+  margin: 0;
+}
+
+/* Logo compacta das barras laterais do aluno e do gestor. */
+.connectclass-logo--sidebar {
+  --cc-font-size: 22px;
+  justify-content: flex-start;
+}
+
+.sidebar-brand:has(.connectclass-logo) {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão de sair da barra lateral. */
+.sidebar-logout {
+  flex: none;
+  min-height: 44px;
+  margin: 8px 16px 16px;
+  color: white;
+  border: 1px solid #8ca7eb;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 14px;
+}
+
+/* Define o efeito visual de o botão de sair da barra lateral quando o usuário passa o mouse. */
+.sidebar-logout:hover { background: #ffffff1f; }
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão para atualizar o histórico. */
+.history-refresh {
+  flex: none;
+  min-height: 40px;
+  padding: 8px 12px;
+  color: #174cda;
+  border: 1px solid #b9ccff;
+  border-radius: 10px;
+  background: #f5f8ff;
+  font-size: 13px;
+}
+
+/* Define a aparência e o comportamento de o botão para atualizar o histórico quando está desativado. */
+.history-refresh:disabled { opacity: .6; cursor: wait; }
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o estado da página quando o menu do aluno está aberto. */
+.student-menu-open { overflow: hidden; }
+/* Oculta o formulário de autenticação quando esse estado é ativado. */
+.auth-form:not(.is-hidden), .portal-screen:not([hidden]) { animation: content-enter 180ms ease-out both; }
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a identificação do remetente da mensagem. */
+.message-sender { color: #667085; font-size: 11px; padding: 0 8px; }
+/* Define o layout, tamanho, espaçamento, cores ou aparência de os dados auxiliares da mensagem. */
+.message-meta { flex-wrap: wrap; }
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o balão da mensagem. */
+.message-bubble { white-space: pre-wrap; }
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a barra lateral do portal do aluno. */
+.portal-sidebar { overflow-y: auto; }
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a descrição exibida na área da marca. */
+.brand-description {
+  max-width: 316px;
+  margin: 18px 0 0;
+  color: rgba(206, 225, 255, 0.72);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a lista de benefícios da tela de autenticação. */
+.benefit-list {
+  display: grid;
+  width: 100%;
+  padding: 0;
+  margin: 52px 0 0;
+  gap: 12px;
+  list-style: none;
+}
+
+/* Ajusta os itens da lista exibidos dentro de a lista de benefícios da tela de autenticação. */
+.benefit-list li {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  color: rgba(255, 255, 255, 0.91);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 14px;
+  text-align: left;
+}
+
+/* Ajusta os ícones SVG exibidos dentro de a lista de benefícios da tela de autenticação. */
+.benefit-list svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--blue-300);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a área principal da autenticação. */
+.auth-main {
+  display: flex;
+  min-width: 0;
+  min-height: 100svh;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #fafbfc;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a marca exibida na versão mobile. */
+.mobile-brand {
+  display: none;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o contêiner dos formulários de autenticação. */
+.auth-stack {
+  width: min(100%, 448px);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o cartão do formulário de autenticação. */
+.auth-card {
+  width: 100%;
+  padding: 32px;
+  border: 1px solid #edf0f4;
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  box-shadow: var(--shadow-card);
+  animation: card-enter 250ms ease-out;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o formulário de autenticação. */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Oculta o formulário de autenticação quando esse estado é ativado. */
+.auth-form.is-hidden {
+  display: none;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o cabeçalho do formulário. */
+.form-heading {
+  margin-bottom: 7px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a versão compacta do cabeçalho do formulário. */
+.form-heading--compact {
+  margin-top: 2px;
+  margin-bottom: 6px;
+}
+
+/* Ajusta o título principal exibidos dentro de o cabeçalho do formulário. */
+.form-heading h1 {
+  margin: 0;
+  color: #101828;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+/* Ajusta os textos exibidos dentro de o cabeçalho do formulário. */
+.form-heading p {
+  margin: 5px 0 0;
+  color: var(--ink-500);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de um campo do formulário. */
+.form-field {
+  min-width: 0;
+}
+
+/* Ajusta os rótulos exibidos dentro de um campo do formulário. */
+.form-field > label {
+  display: block;
+  margin-bottom: 6px;
+  color: #475467;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o contêiner visual dos campos de entrada. */
+.input-shell {
+  position: relative;
+  display: flex;
+  height: 46px;
+  align-items: center;
+  border: 1px solid #dfe3ea;
+  border-radius: 12px;
+  background: #fff;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+/* Destaca o contêiner visual dos campos de entrada quando algum campo interno recebe foco. */
+.input-shell:focus-within {
+  border-color: var(--blue-600);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.11);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o ícone exibido dentro de um campo. */
+.field-icon {
+  width: 17px;
+  height: 17px;
+  margin: 0 11px 0 13px;
+  flex: none;
+  color: #98a2b3;
+}
+
+/* Ajusta os campos de entrada exibidos dentro de o contêiner visual dos campos de entrada. */
+.input-shell input {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  padding: 0 12px 0 0;
+  color: var(--ink-800);
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 14px;
+}
+
+/* Define a aparência do texto de exemplo (placeholder) dentro de o contêiner visual dos campos de entrada. */
+.input-shell input::placeholder {
+  color: #98a2b3;
+  opacity: 1;
+}
+
+/* Define o destaque visual de foco de o contêiner visual dos campos de entrada, facilitando a navegação e o preenchimento. */
+.input-shell input:focus-visible {
+  outline: none;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão para mostrar ou esconder a senha. */
+.password-toggle {
+  display: grid;
+  width: 42px;
+  height: 100%;
+  place-items: center;
+  flex: none;
+  padding: 0;
+  color: #98a2b3;
+  border: 0;
+  background: transparent;
+}
+
+/* Define o efeito visual de o botão para mostrar ou esconder a senha quando o usuário passa o mouse. */
+.password-toggle:hover {
+  color: var(--ink-700);
+}
+
+/* Ajusta os ícones SVG exibidos dentro de o botão para mostrar ou esconder a senha. */
+.password-toggle svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a mensagem de erro de um campo. */
+.field-error {
+  display: none;
+  margin-top: 4px;
+  color: #d92d20;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+/* Aplica a aparência de erro aos elementos de um campo do formulário. */
+.form-field.has-error .input-shell {
+  border-color: #f04438;
+}
+
+/* Aplica a aparência de erro aos elementos de um campo do formulário. */
+.form-field.has-error .field-error {
+  display: block;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a grade de campos do formulário. */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a área de opções do formulário. */
+.form-options {
+  display: flex;
+  min-height: 23px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: -1px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a opção de lembrar o usuário. */
+.remember-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #475467;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Ajusta os campos de entrada exibidos dentro de a opção de lembrar o usuário. */
+.remember-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a caixa de seleção personalizada. */
+.custom-checkbox {
+  display: grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+  border: 2px solid #d0d5dd;
+  border-radius: 4px;
+  background: #fff;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+/* Define a aparência de a opção de lembrar o usuário quando a opção está marcada. */
+.remember-option input:checked + .custom-checkbox {
+  border-color: var(--blue-600);
+  background: var(--blue-600);
+}
+
+/* Cria um elemento visual auxiliar em a opção de lembrar o usuário sem precisar adicionar outro elemento no HTML. */
+.remember-option input:checked + .custom-checkbox::after {
+  width: 7px;
+  height: 4px;
+  margin-top: -2px;
+  content: "";
+  border-bottom: 1.8px solid #fff;
+  border-left: 1.8px solid #fff;
+  transform: rotate(-45deg);
+}
+
+/* Define o destaque visual de foco de a opção de lembrar o usuário, facilitando a navegação e o preenchimento. */
+.remember-option input:focus-visible + .custom-checkbox {
+  outline: 3px solid rgba(37, 99, 235, 0.25);
+  outline-offset: 2px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão com aparência de texto. */
+.text-button,
+.back-link {
+  padding: 0;
+  color: var(--blue-700);
+  border: 0;
+  background: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Define o efeito visual de o botão com aparência de texto quando o usuário passa o mouse. */
+.text-button:hover,
+.back-link:hover {
+  color: #1742be;
+  text-decoration: underline;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão principal. */
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão principal. */
+.primary-button {
+  margin-top: 1px;
+  color: var(--white);
+  border: 1px solid transparent;
+  background: linear-gradient(100deg, #244395, #2256df);
+  box-shadow: 0 4px 10px rgba(37, 80, 202, 0.19);
+}
+
+/* Define o efeito visual de o botão principal quando o usuário passa o mouse. */
+.primary-button:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 6px 14px rgba(37, 80, 202, 0.27);
+}
+
+/* Ajusta os ícones SVG exibidos dentro de o botão principal. */
+.primary-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão secundário. */
+.secondary-button {
+  color: var(--navy-900);
+  border: 2px solid var(--navy-900);
+  background: var(--white);
+}
+
+/* Define o efeito visual de o botão secundário quando o usuário passa o mouse. */
+.secondary-button:hover {
+  color: var(--white);
+  background: var(--navy-900);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o texto auxiliar do formulário. */
+.form-helper {
+  margin: 0;
+  color: #a5b4d0;
+  font-size: 11px;
+  text-align: center;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o divisor visual do formulário. */
+.form-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #a5b4d0;
+  font-size: 12px;
+}
+
+/* Cria um elemento visual auxiliar em o divisor visual do formulário sem precisar adicionar outro elemento no HTML. */
+.form-divider::before,
+.form-divider::after {
+  height: 1px;
+  flex: 1;
+  content: "";
+  background: #eaecf0;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão/link para voltar. */
+.back-link {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 4px;
+  color: var(--ink-500);
+}
+
+/* Ajusta os ícones SVG exibidos dentro de o botão/link para voltar. */
+.back-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o aviso de sucesso. */
+.success-note {
+  margin: 0;
+  padding: 10px 12px;
+  color: #16794b;
+  border: 1px solid #abefc6;
+  border-radius: 10px;
+  background: #ecfdf3;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o rodapé da autenticação. */
+.auth-footer {
+  margin: 24px 0 0;
+  color: #a5b4d0;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* Student portal */
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a tela principal do portal do aluno. */
+.portal-screen {
+  display: flex;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--canvas);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a barra lateral do portal do aluno. */
+.portal-sidebar {
+  display: flex;
+  width: 280px;
+  min-width: 280px;
+  height: 100%;
+  flex-direction: column;
+  color: var(--white);
+  background: linear-gradient(180deg, #263f96 0%, #223f9e 100%);
+  box-shadow: 8px 0 20px rgba(15, 31, 92, 0.08);
+  z-index: 3;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a área da marca na barra lateral. */
+.sidebar-brand {
+  display: flex;
+  min-height: 91px;
+  align-items: center;
+  gap: 13px;
+  padding: 20px 23px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o componente `.sidebar-logo`. */
+.sidebar-logo {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  color: #233f99;
+  border-radius: 10px;
+  background: var(--white);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Ajusta o título principal exibidos dentro de a área da marca na barra lateral. */
+.sidebar-brand h1 {
+  margin: 0;
+  color: var(--white);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+/* Ajusta os textos exibidos dentro de a área da marca na barra lateral. */
+.sidebar-brand p {
+  margin: 4px 0 0;
+  color: #bfdbfe;
+  font-size: 12px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a navegação entre categorias. */
+.category-nav {
+  display: grid;
+  padding: 16px 15px;
+  gap: 12px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão de uma categoria. */
+.category-button {
+  display: flex;
+  width: 100%;
+  min-height: 56px;
+  align-items: center;
+  gap: 17px;
+  padding: 14px 13px;
+  color: var(--white);
+  border: 0;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.11);
+  font-size: 16px;
+  font-weight: 500;
+  text-align: left;
+  transition: color 170ms ease, background 170ms ease, transform 170ms ease, box-shadow 170ms ease;
+}
+
+/* Define o efeito visual de o botão de uma categoria quando o usuário passa o mouse. */
+.category-button:hover {
+  background: rgba(255, 255, 255, 0.19);
+}
+
+/* Destaca o botão de uma categoria quando ele está selecionado ou ativo. */
+.category-button.is-active {
+  color: #25419b;
+  background: var(--white);
+  box-shadow: 0 8px 16px rgba(11, 28, 87, 0.18);
+  transform: scale(1.025);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o contador de mensagens da categoria. */
+.category-count {
+  display: inline-grid;
+  min-width: 24px;
+  height: 24px;
+  place-items: center;
+  padding: 0 6px;
+  margin-left: auto;
+  color: inherit;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+/* Destaca o botão de uma categoria quando ele está selecionado ou ativo. */
+.category-button.is-active .category-count {
+  background: #e7efff;
+}
+
+/* Ajusta os ícones SVG exibidos dentro de o botão de uma categoria. */
+.category-button svg {
+  width: 25px;
+  height: 25px;
+  flex: none;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a área de perfil do aluno. */
+.student-profile {
+  display: flex;
+  min-height: 98px;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 23px;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(9, 27, 96, 0.18);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o avatar do aluno. */
+.student-avatar {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  flex: none;
+  color: var(--white);
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3f9eff, #2d6ce2);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Ajusta os textos em destaque exibidos dentro de a área de perfil do aluno. */
+.student-profile strong,
+.student-profile span {
+  display: block;
+}
+
+/* Ajusta os textos em destaque exibidos dentro de a área de perfil do aluno. */
+.student-profile strong {
+  max-width: 174px;
+  overflow: hidden;
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Ajusta os textos/indicadores internos exibidos dentro de a área de perfil do aluno. */
+.student-profile span {
+  margin-top: 4px;
+  color: #bfdbfe;
+  font-size: 13px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a estrutura principal do chat. */
+.chat-shell {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  height: 100%;
+  flex-direction: column;
+  background: #f8fafc;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o cabeçalho do chat. */
+.chat-header {
+  display: flex;
+  min-height: 99px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 21px 24px;
+  border-bottom: 1px solid #e4e7ec;
+  background: var(--white);
+  box-shadow: 0 2px 3px rgba(16, 24, 40, 0.06);
+  z-index: 1;
+}
+
+/* Ajusta o título exibidos dentro de o cabeçalho do chat. */
+.chat-header h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+/* Ajusta os textos exibidos dentro de o cabeçalho do chat. */
+.chat-header p {
+  margin: 4px 0 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o indicador de status online. */
+.online-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #667085;
+  font-size: 14px;
+}
+
+/* Ajusta os textos/indicadores internos exibidos dentro de o indicador de status online. */
+.online-status span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #48d487;
+  animation: online-pulse 1.8s infinite;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a lista de mensagens. */
+.message-list {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding: 24px;
+  scroll-behavior: smooth;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de os controles de pesquisa do histórico. */
+.history-controls {
+  display: flex;
+  gap: 10px;
+  padding: 14px 24px;
+  border-bottom: 1px solid #e4e7ec;
+  background: #fff;
+}
+
+/* Ajusta os campos de entrada exibidos dentro de os controles de pesquisa do histórico. */
+.history-controls input {
+  min-width: 0;
+  height: 40px;
+  color: var(--ink-700);
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+}
+
+/* Ajusta os campos de entrada exibidos dentro de os controles de pesquisa do histórico. */
+.history-controls input {
+  width: 100%;
+  padding: 0 10px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a linha de uma mensagem. */
+.message-row {
+  display: flex;
+  width: 100%;
+  animation: content-enter 180ms ease-out both;
+}
+
+/* Posiciona e estiliza a linha de uma mensagem enviada pelo aluno para representar conteúdo enviado pelo aluno. */
+.message-row--student {
+  justify-content: flex-end;
+}
+
+/* Posiciona e estiliza a linha de uma mensagem enviada pela secretaria para representar conteúdo enviado pela secretaria. */
+.message-row--secretary {
+  justify-content: flex-start;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o grupo que contém a mensagem e seus dados. */
+.message-group {
+  display: flex;
+  width: min(70%, 770px);
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Posiciona e estiliza a linha de uma mensagem enviada pelo aluno para representar conteúdo enviado pelo aluno. */
+.message-row--student .message-group {
+  align-items: flex-end;
+}
+
+/* Posiciona e estiliza a linha de uma mensagem enviada pela secretaria para representar conteúdo enviado pela secretaria. */
+.message-row--secretary .message-group {
+  align-items: flex-start;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o balão da mensagem. */
+.message-bubble {
+  max-width: 100%;
+  padding: 14px 20px;
+  border-radius: 16px;
+  font-size: 16px;
+  line-height: 1.62;
+  word-break: break-word;
+}
+
+/* Posiciona e estiliza a linha de uma mensagem enviada pelo aluno para representar conteúdo enviado pelo aluno. */
+.message-row--student .message-bubble {
+  color: var(--white);
+  border-top-right-radius: 6px;
+  background: linear-gradient(105deg, #1e59e5, #174cda);
+  box-shadow: 0 3px 5px rgba(30, 89, 229, 0.16);
+}
+
+/* Posiciona e estiliza a linha de uma mensagem enviada pela secretaria para representar conteúdo enviado pela secretaria. */
+.message-row--secretary .message-bubble {
+  color: #344054;
+  border: 1px solid #e3e7ec;
+  border-top-left-radius: 6px;
+  background: var(--white);
+  box-shadow: 0 2px 4px rgba(16, 24, 40, 0.12);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de os dados auxiliares da mensagem. */
+.message-meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 8px;
+  color: #7a8aa2;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+/* Posiciona e estiliza a linha de uma mensagem enviada pelo aluno para representar conteúdo enviado pelo aluno. */
+.message-row--student .message-meta {
+  flex-direction: row;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o indicador de status da mensagem. */
+.message-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 3px 9px;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o nome da categoria da mensagem. */
+.message-category {
+  color: #475467;
+  font-weight: 600;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o status de mensagem pendente. */
+.status--pendente {
+  color: #9a6700;
+  border-color: #fedf89;
+  background: #fffaeb;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o status de mensagem respondida. */
+.status--respondida {
+  color: #2563ca;
+  border-color: #bfdbfe;
+  background: #eaf3ff;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o status de mensagem resolvida. */
+.status--resolvida {
+  color: #16804c;
+  border-color: #abefc6;
+  background: #eafbf0;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o status de mensagem em análise. */
+.status--em-analise {
+  color: #9a6700;
+  border-color: #fedf89;
+  background: #fffaeb;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o estado exibido quando não há mensagens. */
+.empty-state {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o ícone do estado vazio. */
+.empty-state__icon {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  margin: 0 auto 15px;
+  color: var(--blue-600);
+  border-radius: 50%;
+  background: var(--blue-100);
+}
+
+/* Ajusta os ícones SVG exibidos dentro de o ícone do estado vazio. */
+.empty-state__icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+/* Ajusta o subtítulo exibidos dentro de o estado exibido quando não há mensagens. */
+.empty-state h3 {
+  margin: 0;
+  color: var(--ink-800);
+  font-size: 16px;
+}
+
+/* Ajusta os textos exibidos dentro de o estado exibido quando não há mensagens. */
+.empty-state p {
+  margin: 8px 0 0;
+  color: var(--ink-500);
+  font-size: 14px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a área de composição de mensagens. */
+.message-composer {
+  padding: 22px 24px;
+  border-top: 1px solid #e4e7ec;
+  background: var(--white);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o formulário usado para enviar mensagens. */
+.composer-form {
+  display: flex;
+  gap: 10px;
+}
+
+/* Ajusta os campos de entrada exibidos dentro de o formulário usado para enviar mensagens. */
+.composer-form input {
+  width: 100%;
+  min-width: 0;
+  height: 54px;
+  padding: 0 16px;
+  color: var(--ink-800);
+  border: 2px solid #1970ff;
+  border-radius: 16px;
+  outline: 0;
+  background: #f9fafb;
+  font-size: 16px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+/* Define a aparência do texto de exemplo (placeholder) dentro de o formulário usado para enviar mensagens. */
+.composer-form input::placeholder {
+  color: #98a2b3;
+}
+
+/* Define o destaque visual de foco de o formulário usado para enviar mensagens, facilitando a navegação e o preenchimento. */
+.composer-form input:focus {
+  border-color: var(--blue-600);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão de enviar mensagem. */
+.send-button {
+  display: inline-flex;
+  min-width: 122px;
+  height: 50px;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  gap: 8px;
+  color: var(--white);
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(105deg, #6e9df6, #8199ec);
+  box-shadow: 0 4px 8px rgba(59, 105, 211, 0.22);
+  font-size: 16px;
+  font-weight: 500;
+  transition: opacity 150ms ease, filter 150ms ease, transform 150ms ease;
+}
+
+/* Define o efeito visual de o botão de enviar mensagem quando o usuário passa o mouse. */
+.send-button:not(:disabled):hover {
+  filter: brightness(1.04);
+}
+
+/* Define a aparência e o comportamento de o botão de enviar mensagem quando está desativado. */
+.send-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+/* Ajusta os ícones SVG exibidos dentro de o botão de enviar mensagem. */
+.send-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão que abre o menu no celular. */
+.mobile-menu-button,
+.sidebar-overlay {
+  display: none;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a notificação temporária da interface. */
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 20;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 12px 16px;
+  color: var(--white);
+  border-radius: 10px;
+  background: #18377e;
+  box-shadow: 0 12px 22px rgba(15, 31, 92, 0.26);
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+/* Torna a notificação temporária da interface visível quando esse estado é ativado. */
+.toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a página do gestor. */
+.manager-page {
+  min-width: 320px;
+  margin: 0;
+  overflow: hidden;
+  background: var(--canvas);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a estrutura principal do painel do gestor. */
+.manager-app {
+  display: flex;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a barra lateral do gestor. */
+.manager-sidebar {
+  display: flex;
+  width: 280px;
+  min-width: 280px;
+  height: 100%;
+  flex-direction: column;
+  color: var(--white);
+  background: linear-gradient(180deg, #263f96 0%, #223f9e 100%);
+  box-shadow: 8px 0 20px rgba(15, 31, 92, 0.08);
+  z-index: 3;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a navegação do painel do gestor. */
+.manager-nav {
+  display: grid;
+  padding: 16px 15px;
+  gap: 8px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de um botão da navegação do gestor. */
+.manager-nav__button {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  color: var(--white);
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  transition: background 170ms ease, color 170ms ease, transform 170ms ease;
+}
+
+/* Define o efeito visual de um botão da navegação do gestor quando o usuário passa o mouse. */
+.manager-nav__button:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Destaca um botão da navegação do gestor quando ele está selecionado ou ativo. */
+.manager-nav__button.is-active {
+  color: #25419b;
+  background: var(--white);
+  box-shadow: 0 7px 15px rgba(11, 28, 87, 0.16);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a área de perfil do gestor. */
+.manager-profile {
+  display: flex;
+  min-height: 98px;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 23px;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(9, 27, 96, 0.18);
+}
+
+/* Ajusta os textos em destaque exibidos dentro de a área de perfil do gestor. */
+.manager-profile strong,
+.manager-profile span {
+  display: block;
+}
+
+/* Ajusta os textos em destaque exibidos dentro de a área de perfil do gestor. */
+.manager-profile strong {
+  max-width: 174px;
+  overflow: hidden;
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Ajusta os textos/indicadores internos exibidos dentro de a área de perfil do gestor. */
+.manager-profile span {
+  margin-top: 4px;
+  color: #bfdbfe;
+  font-size: 13px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a área principal do painel do gestor. */
+.manager-shell {
+  min-width: 0;
+  flex: 1;
+  overflow: auto;
+  padding: 0 28px 28px;
+  background: #f8fafc;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o cabeçalho do painel do gestor. */
+.manager-header {
+  display: flex;
+  min-height: 99px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 -28px;
+  padding: 21px 28px;
+  border-bottom: 1px solid #e4e7ec;
+  background: var(--white);
+  box-shadow: 0 2px 3px rgba(16, 24, 40, 0.06);
+}
+
+/* Ajusta o título exibidos dentro de o cabeçalho do painel do gestor. */
+.manager-header h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 22px;
+  letter-spacing: -0.025em;
+}
+
+/* Ajusta os textos exibidos dentro de o cabeçalho do painel do gestor. */
+.manager-header p {
+  margin: 5px 0 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão de atualizar dados do gestor. */
+.manager-refresh,
+.manager-clear,
+.manager-back-button {
+  min-height: 40px;
+  padding: 0 14px;
+  color: #174cda;
+  border: 1px solid #b9ccff;
+  border-radius: 10px;
+  background: #f5f8ff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+/* Define o efeito visual de o botão de atualizar dados do gestor quando o usuário passa o mouse. */
+.manager-refresh:hover:not(:disabled),
+.manager-clear:hover,
+.manager-back-button:hover {
+  background: #e7efff;
+}
+
+/* Define a aparência e o comportamento de o botão de atualizar dados do gestor quando está desativado. */
+.manager-refresh:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o painel de métricas do gestor. */
+.manager-dashboard {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(126px, 1fr));
+  gap: 14px;
+  padding: 24px 0 18px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de um cartão de métrica do dashboard. */
+.metric-card {
+  min-height: 112px;
+  padding: 18px;
+  color: #475467;
+  border: 1px solid #e4e7ec;
+  border-radius: 15px;
+  background: var(--white);
+  box-shadow: 0 3px 9px rgba(16, 24, 40, 0.04);
+  font: inherit;
+  text-align: left;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+/* Define o efeito visual de um cartão de métrica do dashboard quando o usuário passa o mouse. */
+.metric-card:hover {
+  border-color: #aec7ff;
+  box-shadow: 0 8px 18px rgba(37, 89, 229, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Ajusta os textos em destaque exibidos dentro de um cartão de métrica do dashboard. */
+.metric-card span,
+.metric-card strong {
+  display: block;
+}
+
+/* Ajusta os textos/indicadores internos exibidos dentro de um cartão de métrica do dashboard. */
+.metric-card span {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Ajusta os textos em destaque exibidos dentro de um cartão de métrica do dashboard. */
+.metric-card strong {
+  margin-top: 11px;
+  color: #18377e;
+  font-size: 30px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a área de filtros do gestor. */
+.manager-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) repeat(4, minmax(140px, 1fr));
+  align-items: end;
+  gap: 12px;
+  padding: 17px;
+  border: 1px solid #e4e7ec;
+  border-radius: 15px;
+  background: var(--white);
+  box-shadow: 0 3px 9px rgba(16, 24, 40, 0.03);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de um filtro do painel do gestor. */
+.manager-filter {
+  min-width: 0;
+}
+
+/* Ajusta os rótulos exibidos dentro de um filtro do painel do gestor. */
+.manager-filter label {
+  display: block;
+  margin-bottom: 6px;
+  color: #475467;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Ajusta os campos de entrada exibidos dentro de um filtro do painel do gestor. */
+.manager-filter input,
+.manager-filter select {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 10px;
+  color: #344054;
+  border: 1px solid #d0d5dd;
+  border-radius: 9px;
+  outline: 0;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+}
+
+/* Define o destaque visual de foco de um filtro do painel do gestor, facilitando a navegação e o preenchimento. */
+.manager-filter input:focus,
+.manager-filter select:focus {
+  border-color: #4d7fea;
+  box-shadow: 0 0 0 3px rgba(77, 127, 234, 0.12);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão para limpar os filtros. */
+.manager-clear {
+  align-self: end;
+  min-width: 122px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a área que organiza lista e detalhes das conversas. */
+.manager-messages {
+  display: grid;
+  min-height: min(560px, calc(100svh - 430px));
+  grid-template-columns: minmax(290px, 0.78fr) minmax(360px, 1.42fr);
+  gap: 16px;
+  margin-top: 18px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o painel com a lista de conversas. */
+.manager-list-panel,
+.manager-detail-panel {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e4e7ec;
+  border-radius: 15px;
+  background: var(--white);
+  box-shadow: 0 3px 9px rgba(16, 24, 40, 0.03);
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o painel com a lista de conversas. */
+.manager-list-panel {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o cabeçalho do painel de conversas. */
+.manager-panel-heading,
+.manager-detail-header {
+  padding: 17px 18px;
+  border-bottom: 1px solid #eaecf0;
+}
+
+/* Ajusta o subtítulo exibidos dentro de o cabeçalho do painel de conversas. */
+.manager-panel-heading h3,
+.manager-detail-header h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 16px;
+}
+
+/* Ajusta os textos exibidos dentro de o cabeçalho do painel de conversas. */
+.manager-panel-heading p,
+.manager-detail-header p {
+  margin: 5px 0 0;
+  color: #667085;
+  font-size: 12px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a lista de conversas do gestor. */
+.manager-conversation-list {
+  display: grid;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de um item da lista de conversas. */
+.conversation-item {
+  width: 100%;
+  padding: 15px 17px;
+  color: #344054;
+  border: 0;
+  border-bottom: 1px solid #eaecf0;
+  background: var(--white);
+  font: inherit;
+  text-align: left;
+  transition: background 150ms ease, box-shadow 150ms ease;
+}
+
+/* Define o efeito visual de um item da lista de conversas quando o usuário passa o mouse. */
+.conversation-item:hover,
+.conversation-item.is-active {
+  background: #f3f7ff;
+}
+
+/* Destaca um item da lista de conversas quando ele está selecionado ou ativo. */
+.conversation-item.is-active {
+  box-shadow: inset 3px 0 #2654d6;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a parte superior do item de conversa. */
+.conversation-item__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Ajusta os textos em destaque exibidos dentro de a parte superior do item de conversa. */
+.conversation-item__top strong {
+  overflow: hidden;
+  color: #1d2939;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Ajusta o horário/data exibidos dentro de a parte superior do item de conversa. */
+.conversation-item__top time {
+  flex: none;
+  color: #98a2b3;
+  font-size: 10px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a identificação do usuário na conversa. */
+.conversation-item__identity,
+.conversation-item__message {
+  overflow: hidden;
+  margin: 5px 0 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a identificação do usuário na conversa. */
+.conversation-item__identity {
+  color: #667085;
+  font-size: 11px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de a prévia da mensagem da conversa. */
+.conversation-item__message {
+  color: #475467;
+  font-size: 13px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de os dados auxiliares da conversa. */
+.conversation-item__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o painel com os detalhes da conversa selecionada. */
+.manager-detail-panel {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o cabeçalho dos detalhes da conversa. */
+.manager-detail-header {
+  flex: none;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o botão para voltar na visualização mobile do gestor. */
+.manager-back-button {
+  display: none;
+  min-height: 32px;
+  padding: 0 9px;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o histórico de mensagens exibido ao gestor. */
+.manager-message-history {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
+  padding: 22px;
+  scroll-behavior: smooth;
+}
+
+/* Define o layout, tamanho, espaçamento, cores ou aparência de o estado informativo do painel do gestor. */
+.manager-state {
+  display: grid;
+  min-height: 150px;
+  place-items: center;
+  padding: 24px;
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Aplica a cor de erro em o estado informativo do painel do gestor quando ocorre uma falha. */
+.manager-state.is-error {
+  color: #b42318;
+}
+
+
+/* Define a animação de entrada da marca na tela de autenticação. */
+@keyframes brand-enter {
+  /* Estado inicial da animação. */
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  /* Estado final da animação. */
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Define a animação de entrada do cartão de autenticação. */
+@keyframes card-enter {
+  /* Estado inicial da animação. */
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  /* Estado final da animação. */
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Define uma animação suave de entrada para conteúdos e mensagens. */
+@keyframes content-enter {
+  /* Estado inicial da animação. */
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  /* Estado final da animação. */
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Define o efeito pulsante usado no indicador de status online. */
+@keyframes online-pulse {
+  /* Estado inicial e final da animação. */
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(72, 212, 135, 0.35);
+  }
+  /* Estado intermediário da animação. */
+  50% {
+    box-shadow: 0 0 0 5px rgba(72, 212, 135, 0);
+  }
+}
+
+/* Responsividade: reorganiza o painel do gestor em telas de até 1200px. */
+@media (max-width: 1200px) {
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o painel de métricas do gestor. */
+  .manager-dashboard {
+    grid-template-columns: repeat(3, minmax(150px, 1fr));
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a área de filtros do gestor. */
+  .manager-filters {
+    grid-template-columns: minmax(220px, 2fr) repeat(2, minmax(150px, 1fr));
+  }
+}
+
+/* Responsividade: adapta o painel do gestor para tablets e telas de até 900px. */
+@media (max-width: 900px) {
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a barra lateral do gestor. */
+  .manager-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-105%);
+    transition: transform 220ms ease;
+  }
+
+  /* Mostra ou reposiciona a barra lateral do gestor quando o menu ou painel está aberto. */
+  .manager-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o botão/menu mobile do gestor. */
+  .manager-mobile-menu {
+    display: grid;
+    position: fixed;
+    top: 18px;
+    left: 16px;
+    z-index: 4;
+    width: 38px;
+    height: 38px;
+    align-content: center;
+    justify-items: center;
+    gap: 4px;
+    padding: 0;
+    color: var(--navy-900);
+    border: 1px solid #e4e7ec;
+    border-radius: 10px;
+    background: var(--white);
+    box-shadow: 0 3px 8px rgba(16, 24, 40, 0.12);
+  }
+
+  /* Ajusta os textos/indicadores internos exibidos dentro de o botão/menu mobile do gestor. */
+  .manager-mobile-menu span {
+    display: block;
+    width: 16px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o estado da página quando o menu do gestor está aberto. */
+  .manager-menu-open {
+    overflow: hidden;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a área principal do painel do gestor. */
+  .manager-shell {
+    padding: 0 16px 18px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o cabeçalho do painel do gestor. */
+  .manager-header {
+    min-height: 82px;
+    padding: 16px 18px 16px 66px;
+    margin: 0 -16px;
+  }
+
+  /* Ajusta o título exibidos dentro de o cabeçalho do painel do gestor. */
+  .manager-header h2 {
+    font-size: 18px;
+  }
+
+  /* Ajusta os textos exibidos dentro de o cabeçalho do painel do gestor. */
+  .manager-header p {
+    font-size: 12px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o painel de métricas do gestor. */
+  .manager-dashboard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 16px 0;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de um cartão de métrica do dashboard. */
+  .metric-card {
+    min-height: 94px;
+    padding: 14px;
+  }
+
+  /* Ajusta os textos em destaque exibidos dentro de um cartão de métrica do dashboard. */
+  .metric-card strong {
+    margin-top: 7px;
+    font-size: 26px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a área de filtros do gestor. */
+  .manager-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 14px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o filtro de pesquisa do gestor. */
+  .manager-filter--search {
+    grid-column: 1 / -1;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o botão para limpar os filtros. */
+  .manager-clear {
+    width: 100%;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a área que organiza lista e detalhes das conversas. */
+  .manager-messages {
+    min-height: 460px;
+    grid-template-columns: 1fr;
+    margin-top: 14px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o painel com a lista de conversas. */
+  .manager-list-panel,
+  .manager-detail-panel {
+    min-height: 460px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o botão para voltar na visualização mobile do gestor. */
+  .manager-back-button {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o estado em que uma conversa está aberta no mobile. */
+  .manager-conversation-open .manager-list-panel {
+    display: none;
+  }
+}
+
+/* Responsividade: adapta a autenticação para tablets e telas de até 1023px. */
+@media (max-width: 1023px) {
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a tela de autenticação. */
+  .auth-screen {
+    display: block;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a área visual da marca na autenticação. */
+  .auth-brand {
+    display: none;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a área principal da autenticação. */
+  .auth-main {
+    min-height: 100svh;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a marca exibida na versão mobile. */
+  .mobile-brand {
+    display: flex;
+    position: absolute;
+    top: 22px;
+    left: 24px;
+    align-items: center;
+    gap: 10px;
+    color: var(--navy-900);
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a versão pequena do símbolo da marca. */
+  .brand-symbol--small {
+    width: 37px;
+    height: 37px;
+    color: var(--white);
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--navy-900), var(--blue-700));
+    font-size: 12px;
+    font-weight: 700;
+  }
+}
+
+/* Responsividade: adapta autenticação, menu, chat e envio de mensagens para celulares de até 760px. */
+@media (max-width: 760px) {
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a área principal da autenticação. */
+  .auth-main {
+    align-items: flex-start;
+    padding: 124px 16px 28px;
+    overflow-y: auto;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a marca exibida na versão mobile. */
+  .mobile-brand {
+    top: 20px;
+    left: 20px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o cartão do formulário de autenticação. */
+  .auth-card {
+    padding: 25px 20px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a grade de campos do formulário. */
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o rodapé da autenticação. */
+  .auth-footer {
+    margin: 18px 0 0;
+    font-size: 11px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a barra lateral do portal do aluno. */
+  .portal-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-105%);
+    transition: transform 220ms ease;
+  }
+
+  /* Mostra ou reposiciona a barra lateral do portal do aluno quando o menu ou painel está aberto. */
+  .portal-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a camada escura exibida atrás do menu mobile. */
+  .sidebar-overlay {
+    position: fixed;
+    z-index: 2;
+    inset: 0;
+    background: rgba(16, 24, 40, 0.48);
+  }
+
+  /* Mostra ou reposiciona a camada escura exibida atrás do menu mobile quando o menu ou painel está aberto. */
+  .sidebar-overlay.is-open {
+    display: block;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o botão que abre o menu no celular. */
+  .mobile-menu-button {
+    display: grid;
+    position: fixed;
+    top: 18px;
+    left: 16px;
+    z-index: 4;
+    width: 38px;
+    height: 38px;
+    align-content: center;
+    justify-items: center;
+    gap: 4px;
+    padding: 0;
+    color: var(--navy-900);
+    border: 1px solid #e4e7ec;
+    border-radius: 10px;
+    background: var(--white);
+    box-shadow: 0 3px 8px rgba(16, 24, 40, 0.12);
+  }
+
+  /* Ajusta os textos/indicadores internos exibidos dentro de o botão que abre o menu no celular. */
+  .mobile-menu-button span {
+    display: block;
+    width: 16px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o cabeçalho do chat. */
+  .chat-header {
+    min-height: 82px;
+    padding: 16px 18px 16px 66px;
+  }
+
+  /* Ajusta o título exibidos dentro de o cabeçalho do chat. */
+  .chat-header h2 {
+    font-size: 17px;
+  }
+
+  /* Ajusta os textos exibidos dentro de o cabeçalho do chat. */
+  .chat-header p,
+  .online-status {
+    font-size: 12px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o indicador de status online. */
+  .online-status {
+    gap: 7px;
+  }
+
+  /* Ajusta os textos/indicadores internos exibidos dentro de o indicador de status online. */
+  .online-status span {
+    width: 9px;
+    height: 9px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a lista de mensagens. */
+  .message-list {
+    padding: 18px 16px;
+    gap: 14px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de os controles de pesquisa do histórico. */
+  .history-controls {
+    padding: 12px 16px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o grupo que contém a mensagem e seus dados. */
+  .message-group {
+    width: min(86%, 560px);
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o balão da mensagem. */
+  .message-bubble {
+    padding: 12px 15px;
+    font-size: 14px;
+    line-height: 1.52;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a área de composição de mensagens. */
+  .message-composer {
+    padding: 14px 16px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o formulário usado para enviar mensagens. */
+  .composer-form {
+    gap: 8px;
+  }
+
+  /* Ajusta os campos de entrada exibidos dentro de o formulário usado para enviar mensagens. */
+  .composer-form input {
+    height: 49px;
+    border-radius: 13px;
+    font-size: 14px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o botão de enviar mensagem. */
+  .send-button {
+    width: 52px;
+    min-width: 52px;
+    height: 47px;
+    padding: 0;
+    border-radius: 13px;
+  }
+
+  /* Ajusta os textos/indicadores internos exibidos dentro de o botão de enviar mensagem. */
+  .send-button span {
+    display: none;
+  }
+
+  /* Ajusta os ícones SVG exibidos dentro de o botão de enviar mensagem. */
+  .send-button svg {
+    width: 21px;
+    height: 21px;
+  }
+}
+
+/* Responsividade: faz ajustes extras para celulares muito estreitos, de até 400px. */
+@media (max-width: 400px) {
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a área principal da autenticação. */
+  .auth-main {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o cartão do formulário de autenticação. */
+  .auth-card {
+    padding: 23px 16px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a área de opções do formulário. */
+  .form-options {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a área principal do painel do gestor. */
+  .manager-shell {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o cabeçalho do painel do gestor. */
+  .manager-header {
+    margin-right: -12px;
+    margin-left: -12px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de a área de filtros do gestor. */
+  .manager-filters {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o filtro de pesquisa do gestor. */
+  .manager-filter--search {
+    grid-column: auto;
+  }
+
+  /* Define o layout, tamanho, espaçamento, cores ou aparência de o botão de atualizar dados do gestor. */
+  .manager-refresh {
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+}
+
+/* Acessibilidade: reduz animações e transições para usuários que preferem menos movimento. */
+@media (prefers-reduced-motion: reduce) {
+  /* Cria um elemento visual auxiliar em os elementos selecionados por `*, *::before, *::after` sem precisar adicionar outro elemento no HTML. */
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Ajusta a nova imagem da marca em telas menores. */
+@media (max-width: 900px) {
+  .auth-symbol-image {
+    width: 88px;
+    height: 88px;
+    margin-bottom: 10px;
+  }
+}
