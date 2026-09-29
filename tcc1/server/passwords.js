@@ -35,7 +35,7 @@ export async function hashPassword(password) {
 }
 
 export async function verifyPassword(password, serializedHash) {
-  if (typeof password !== "string" || typeof serializedHash !== "string") {
+  if (typeof password !== "string" || password.length > 128 || typeof serializedHash !== "string") {
     return false;
   }
 
@@ -46,9 +46,9 @@ export async function verifyPassword(password, serializedHash) {
 
   if (
     algorithm !== "scrypt" ||
-    !Number.isInteger(N) ||
-    !Number.isInteger(r) ||
-    !Number.isInteger(p) ||
+    N !== SCRYPT_PARAMETERS.N ||
+    r !== SCRYPT_PARAMETERS.r ||
+    p !== SCRYPT_PARAMETERS.p ||
     !encodedSalt ||
     !encodedHash
   ) {
@@ -58,6 +58,7 @@ export async function verifyPassword(password, serializedHash) {
   try {
     const salt = Buffer.from(encodedSalt, "base64url");
     const expectedHash = Buffer.from(encodedHash, "base64url");
+    if (salt.length !== 16 || expectedHash.length !== DERIVED_KEY_LENGTH) return false;
     const actualHash = Buffer.from(
       await scryptAsync(password, salt, expectedHash.length, {
         N,

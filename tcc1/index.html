@@ -19,19 +19,7 @@
           <div class="brand-orb brand-orb--bottom" aria-hidden="true"></div>
 
           <div class="auth-brand__content">
-            <div class="brand-symbol brand-symbol--large" aria-hidden="true">
-              <svg viewBox="0 0 52 44" fill="none" role="img">
-                <rect x="2" y="2" width="30" height="24" rx="5" stroke="currentColor" stroke-width="2.5" />
-                <path d="M9 11h16M9 17h11" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                <path d="M8 26v7l8-7" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" />
-                <rect x="18" y="16" width="30" height="24" rx="5" fill="#2654d6" stroke="currentColor" stroke-width="2.5" />
-                <circle cx="26" cy="28" r="2" fill="currentColor" />
-                <circle cx="33" cy="28" r="2" fill="currentColor" />
-                <circle cx="40" cy="28" r="2" fill="currentColor" />
-              </svg>
-            </div>
-
-            <img class="brand-wordmark" src="Captura de tela de 2026-06-07 23-06-40.png" alt="Logo ConnectClass" />
+            <img class="auth-logo" src="/assets/connectclass-logo.png" alt="ConnectClass" />
             <p class="brand-tagline">Conectando alunos e secretaria de forma simples e eficiente.</p>
             <p class="brand-description">
               Envie perguntas, reclamações e sugestões diretamente para a secretaria escolar — tudo em um só lugar.
@@ -48,7 +36,7 @@
               </li>
               <li>
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.5v5l3.25 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <span>Respostas em tempo real</span>
+                <span>Acompanhe suas mensagens e respostas</span>
               </li>
             </ul>
           </div>
@@ -56,10 +44,7 @@
 
         <main class="auth-main">
           <div class="mobile-brand" aria-label="ConnectClass">
-            <div class="brand-symbol brand-symbol--small" aria-hidden="true">
-              <span>CC</span>
-            </div>
-            <span>ConnectClass</span>
+            <img class="auth-logo auth-logo--mobile" src="/assets/connectclass-logo.png" alt="ConnectClass" />
           </div>
 
           <div class="auth-stack">
@@ -194,7 +179,7 @@
                 </button>
                 <header class="form-heading form-heading--compact">
                   <h1>Recuperar senha</h1>
-                  <p>Informe seu e-mail e enviaremos as instruções de acesso.</p>
+                  <p>Para recuperar o acesso, procure a secretaria escolar com seu RA. A recuperação por e-mail ainda não está disponível.</p>
                 </header>
                 <div class="form-field">
                   <label for="forgotEmail">E-mail Institucional</label>
@@ -205,7 +190,7 @@
                   <small class="field-error" data-error-for="forgotEmail"></small>
                 </div>
                 <button class="primary-button" type="submit">
-                  <span>Enviar instruções</span>
+                  <span>Ver orientação de acesso</span>
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
                 <p id="forgotSuccess" class="success-note" hidden></p>
@@ -224,9 +209,9 @@
 
         <aside id="portalSidebar" class="portal-sidebar">
           <div class="sidebar-brand">
-            <div class="sidebar-logo" aria-hidden="true">CC</div>
+            <img class="sidebar-brand-image" src="/assets/connectclass-logo.png" alt="ConnectClass" />
             <div>
-              <h1>ConnectClass</h1>
+              <h1 class="sr-only">ConnectClass</h1>
               <p>Portal do Aluno</p>
             </div>
           </div>
@@ -234,12 +219,13 @@
           <nav id="categoryNav" class="category-nav" aria-label="Categorias de atendimento"></nav>
 
           <div class="student-profile">
-            <div id="studentAvatar" class="student-avatar" aria-hidden="true">AM</div>
+            <div id="studentAvatar" class="student-avatar" aria-hidden="true"></div>
             <div>
-              <strong id="studentName">Ana Maria Santos</strong>
-              <span id="studentClass">3º Ano - Turma B</span>
+              <strong id="studentName"></strong>
+              <span id="studentClass"></span>
             </div>
           </div>
+          <button id="studentLogoutButton" class="sidebar-logout" type="button">Sair da conta</button>
         </aside>
 
         <main class="chat-shell">
@@ -248,14 +234,12 @@
               <h2>Secretaria Escolar</h2>
               <p id="categoryTitle">Perguntas</p>
             </div>
-            <div class="online-status"><span></span>Online</div>
+            <button id="studentRefreshButton" class="history-refresh" type="button">Atualizar</button>
           </header>
 
-          <section class="history-controls" aria-label="Buscar e filtrar histórico">
+          <section class="history-controls" aria-label="Buscar no histórico atual">
             <label class="sr-only" for="historySearch">Buscar mensagens</label>
-            <input id="historySearch" type="search" autocomplete="off" placeholder="Buscar no histórico..." />
-            <label class="sr-only" for="historyFilter">Filtrar por categoria</label>
-            <select id="historyFilter" aria-label="Filtrar por categoria"></select>
+            <input id="historySearch" type="search" maxlength="1000" autocomplete="off" placeholder="Buscar no histórico..." />
           </section>
 
           <section id="messageList" class="message-list" aria-live="polite" aria-label="Mensagens da conversa"></section>
@@ -263,8 +247,8 @@
           <footer class="message-composer">
             <form id="messageForm" class="composer-form">
               <label class="sr-only" for="messageInput">Digite sua mensagem</label>
-              <input id="messageInput" type="text" maxlength="500" autocomplete="off" placeholder="Digite sua mensagem..." />
-              <button id="sendButton" class="send-button" type="submit" disabled>
+              <input id="messageInput" type="text" maxlength="1000" autocomplete="off" placeholder="Digite sua pergunta..." />
+              <button id="sendButton" class="send-button" type="submit" aria-label="Enviar mensagem" disabled>
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m21 3-7.25 18-3.4-7.35L3 10.25 21 3Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="m10.35 13.65 4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
                 <span>Enviar</span>
               </button>
@@ -275,6 +259,7 @@
     </div>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="/message-ui.js" defer></script>
     <script src="script.js" defer></script>
   </body>
 </html>

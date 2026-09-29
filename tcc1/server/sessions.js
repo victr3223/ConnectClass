@@ -7,6 +7,9 @@ export function createSessionStore({ regularTtlMs, rememberedTtlMs }) {
 
   return {
     create(userId, rememberMe) {
+      for (const [existingToken, session] of sessions) {
+        if (session.expiresAt <= Date.now()) sessions.delete(existingToken);
+      }
       const token = randomBytes(32).toString("base64url");
       const expiresAt = Date.now() + (rememberMe ? rememberedTtlMs : regularTtlMs);
       sessions.set(token, { userId, expiresAt });
@@ -42,7 +45,7 @@ export function readCookies(header = "") {
       // Cookies inválidos são simplesmente ignorados.
     }
     return cookies;
-  }, {});
+  }, Object.create(null));
 }
 
 export function serializeSessionCookie(token, expiresAt, secure) {

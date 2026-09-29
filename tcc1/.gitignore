@@ -5,3 +5,11 @@ node_modules/
 data/*.json
 data/*.tmp
 coverage/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+backups/
+database/private/
+*.sql.gz
+*.dump

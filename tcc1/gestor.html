@@ -5,13 +5,132 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ConnectClass | Área do gestor</title>
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/manager.css" />
   </head>
   <body class="manager-page">
-    <main class="manager-card">
-      <div class="brand-symbol brand-symbol--small" aria-hidden="true">CC</div>
-      <p class="manager-eyebrow">ConnectClass</p>
-      <h1>Área do gestor protegida</h1>
-      <p>Autenticação e controle de acesso estão ativos. O painel de mensagens será desenvolvido na Fase 3.</p>
-    </main>
+    <div class="manager-app">
+      <button id="managerMobileMenuButton" class="mobile-menu-button manager-mobile-menu" type="button" aria-controls="managerSidebar" aria-expanded="false" aria-label="Abrir menu administrativo">
+        <span></span><span></span><span></span>
+      </button>
+      <div id="managerSidebarOverlay" class="sidebar-overlay" aria-hidden="true"></div>
+
+      <aside id="managerSidebar" class="manager-sidebar">
+        <div class="sidebar-brand">
+          <img class="sidebar-brand-image" src="/assets/connectclass-logo.png" alt="ConnectClass" />
+          <div>
+            <h1 class="sr-only">ConnectClass</h1>
+            <p>Gestor</p>
+          </div>
+        </div>
+
+        <nav id="managerNav" class="manager-nav" aria-label="Navegação administrativa">
+          <button type="button" class="manager-nav__button is-active" data-manager-view="dashboard">Dashboard</button>
+          <button type="button" class="manager-nav__button" data-manager-view="todos">Todas as mensagens</button>
+          <button type="button" class="manager-nav__button" data-manager-view="perguntas">Perguntas</button>
+          <button type="button" class="manager-nav__button" data-manager-view="reclamacoes">Reclamações</button>
+          <button type="button" class="manager-nav__button" data-manager-view="sugestoes">Sugestões</button>
+        </nav>
+
+        <div class="manager-profile">
+          <div id="managerAvatar" class="student-avatar" aria-hidden="true">AC</div>
+          <div>
+            <strong id="managerName">Administrador ConnectClass</strong>
+            <span>Área administrativa</span>
+          </div>
+        </div>
+        <button id="managerLogoutButton" class="sidebar-logout" type="button">Sair da conta</button>
+      </aside>
+
+      <main class="manager-shell">
+        <header class="manager-header">
+          <div>
+            <h2 id="managerViewTitle">Dashboard</h2>
+            <p id="managerViewDescription">Acompanhe as mensagens enviadas pelos alunos.</p>
+          </div>
+          <button id="managerRefreshButton" class="manager-refresh" type="button">Atualizar</button>
+        </header>
+
+        <section id="managerDashboard" class="manager-dashboard" aria-label="Indicadores do atendimento">
+          <button type="button" class="metric-card" data-dashboard-filter="todos">
+            <span>Total de mensagens</span><strong data-metric="total">—</strong>
+          </button>
+          <button type="button" class="metric-card" data-dashboard-filter="pendentes">
+            <span>Pendentes</span><strong data-metric="pendentes">—</strong>
+          </button>
+          <button type="button" class="metric-card" data-dashboard-filter="perguntas">
+            <span>Perguntas</span><strong data-metric="perguntas">—</strong>
+          </button>
+          <button type="button" class="metric-card" data-dashboard-filter="reclamacoes">
+            <span>Reclamações</span><strong data-metric="reclamacoes">—</strong>
+          </button>
+          <button type="button" class="metric-card" data-dashboard-filter="sugestoes">
+            <span>Sugestões</span><strong data-metric="sugestoes">—</strong>
+          </button>
+          <button type="button" class="metric-card" data-dashboard-filter="emAnalise"><span>Em análise</span><strong data-metric="emAnalise">—</strong></button>
+          <button type="button" class="metric-card" data-dashboard-filter="respondidas"><span>Respondidas</span><strong data-metric="respondidas">—</strong></button>
+          <button type="button" class="metric-card" data-dashboard-filter="resolvidas"><span>Resolvidas</span><strong data-metric="resolvidas">—</strong></button>
+        </section>
+
+        <section class="manager-search-area" aria-label="Pesquisar atendimentos">
+          <div class="manager-filter manager-filter--search">
+            <label for="managerSearch">Busca</label>
+            <input id="managerSearch" type="search" maxlength="1000" autocomplete="off" placeholder="Nome, RA, turma ou mensagem" />
+          </div>
+          <details id="managerFilterDetails" open>
+          <summary><span id="managerFilterCount">Filtros</span></summary>
+          <div class="manager-filters">
+          <div class="manager-filter">
+            <label for="managerStudentFilter">Aluno</label>
+            <select id="managerStudentFilter"><option value="">Todos os alunos</option></select>
+          </div>
+          <div class="manager-filter">
+            <label for="managerClassFilter">Turma</label>
+            <select id="managerClassFilter"><option value="">Todas as turmas</option></select>
+          </div>
+          <div class="manager-filter">
+            <label for="managerCategoryFilter">Categoria</label>
+            <select id="managerCategoryFilter">
+              <option value="todos">Todas as categorias</option>
+              <option value="perguntas">Pergunta</option>
+              <option value="reclamacoes">Reclamação</option>
+              <option value="sugestoes">Sugestão</option>
+            </select>
+          </div>
+          <div class="manager-filter">
+            <label for="managerStatusFilter">Status</label>
+            <select id="managerStatusFilter"><option value="">Todos os status</option></select>
+          </div>
+          <div class="manager-filter">
+            <label for="managerStartDate">Data inicial do envio</label>
+            <input id="managerStartDate" type="date" />
+          </div>
+          <div class="manager-filter">
+            <label for="managerEndDate">Data final do envio</label>
+            <input id="managerEndDate" type="date" />
+          </div>
+          <button id="managerClearFilters" class="manager-clear" type="button">Limpar filtros</button>
+          <p class="manager-date-hint">Período do envio pelo aluno · horário de Brasília.</p>
+          </div>
+          </details>
+        </section>
+        <p id="managerFeedback" class="manager-feedback" role="status" hidden></p>
+
+        <section class="manager-messages" aria-label="Conversas dos alunos">
+          <div id="managerListPanel" class="manager-list-panel">
+            <header class="manager-panel-heading">
+              <div>
+                <h3>Conversas</h3>
+                <p id="managerConversationCount">0 conversas</p>
+              </div>
+            </header>
+            <div id="managerConversationList" class="manager-conversation-list" aria-live="polite"><p class="manager-state">Carregando mensagens...</p></div>
+          </div>
+
+          <article id="managerDetailPanel" class="manager-detail-panel" aria-live="polite"></article>
+        </section>
+      </main>
+    </div>
+    <script src="/message-ui.js" defer></script>
+    <script src="/gestor.js" defer></script>
   </body>
 </html>

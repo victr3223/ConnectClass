@@ -1,7 +1,7 @@
 import { hashPassword, validatePassword, verifyPassword } from "./passwords.js";
-import { ensureJsonFile, readJson, updateJson } from "./json-store.js";
 
-const EMPTY_USERS = { usuarios: [] };
+
+
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export class ValidationError extends Error {
@@ -20,103 +20,63 @@ export class ConflictError extends Error {
   }
 }
 
-export function createUserRepository(usersFile) {
-  return {
-    async initialize() {
-      await ensureJsonFile(usersFile, EMPTY_USERS);
-    },
+const USER_COLUMNS = "id, nome, ra, email, senha_hash AS senhaHash, tipo, turma";
 
+export function createUserRepository(pool) {
+  return {
+    async initialize() { await pool.execute("SELECT " + USER_COLUMNS + " FROM users LIMIT 0"); },
     async createStudent(input) {
       const fields = validateStudentInput(input);
-      if (Object.keys(fields).length > 0) {
-        throw new ValidationError(fields);
+      if (Object.keys(fields).length) throw new ValidationError(fields);
+      const user = { nome: input.nome.trim(), ra: input.ra.trim(), turma: input.turma.trim(),
+        email: normalizeEmail(input.email), senhaHash: await hashPassword(input.senha), tipo: "aluno" };
+      try {
+        const [result] = await pool.execute(
+          "INSERT INTO users (nome, ra, turma, email, senha_hash, tipo, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'aluno', UTC_TIMESTAMP(3), UTC_TIMESTAMP(3))",
+          [user.nome, user.ra, user.turma, user.email, user.senhaHash]);
+        return publicUser({ ...user, id: result.insertId });
+      } catch (error) {
+        if (error.code === "ER_DUP_ENTRY") throw new ConflictError(error.sqlMessage?.includes("uq_users_ra") ? "ra" : "email");
+        throw error;
       }
-
-      const nome = input.nome.trim();
-      const ra = input.ra.trim();
-      const turma = input.turma.trim();
-      const email = normalizeEmail(input.email);
-      const senhaHash = await hashPassword(input.senha);
-      let createdUser;
-
-      await updateJson(usersFile, EMPTY_USERS, (data) => {
-        assertUsersDocument(data);
-
-        if (data.usuarios.some((user) => normalizeRa(user.ra) === normalizeRa(ra))) {
-          throw new ConflictError("ra");
-        }
-
-        if (data.usuarios.some((user) => normalizeEmail(user.email) === email)) {
-          throw new ConflictError("email");
-        }
-
-        createdUser = {
-          id: nextId(data.usuarios),
-          nome,
-          ra,
-          email,
-          senhaHash,
-          tipo: "aluno",
-          turma,
-        };
-        data.usuarios.push(createdUser);
-      });
-
-      return publicUser(createdUser);
     },
-
     async authenticate(identity, password) {
-      const normalizedIdentity = String(identity ?? "").trim();
-      if (!normalizedIdentity || typeof password !== "string") {
-        return null;
-      }
-
-      const data = await readJson(usersFile, EMPTY_USERS);
-      assertUsersDocument(data);
-      const normalizedEmail = normalizeEmail(normalizedIdentity);
-      const normalizedRa = normalizeRa(normalizedIdentity);
-      const user = data.usuarios.find(
-        (candidate) =>
-          normalizeEmail(candidate.email) === normalizedEmail ||
-          normalizeRa(candidate.ra) === normalizedRa
-      );
-
-      if (!user || !(await verifyPassword(password, user.senhaHash))) {
-        return null;
-      }
-
-      return user;
+      if (typeof identity !== "string" || identity.length > 254 || typeof password !== "string" || password.length > 128 || !password.length) return null;
+      const normalized = normalizeEmail(identity);
+      if (!normalized) return null;
+      const [rows] = await pool.execute("SELECT " + USER_COLUMNS + " FROM users WHERE email = ? OR ra = ? ORDER BY id LIMIT 1", [normalized, normalizeRa(identity)]);
+      const user = rows[0];
+      return user && await verifyPassword(password, user.senhaHash) ? user : null;
     },
-
     async findById(id) {
-      const data = await readJson(usersFile, EMPTY_USERS);
-      assertUsersDocument(data);
-      return data.usuarios.find((user) => user.id === id) ?? null;
+      const [rows] = await pool.execute("SELECT " + USER_COLUMNS + " FROM users WHERE id = ?", [id]);
+      return rows[0] ?? null;
     },
-
+    async listStudents() {
+      const [rows] = await pool.execute("SELECT id, nome, ra, email, tipo, turma FROM users WHERE tipo = 'aluno' ORDER BY id");
+      return rows.map(publicUser);
+    },
     async ensureInitialManager(password) {
-      let createdManager = null;
-      const senhaHash = await hashPassword(password);
-
-      await updateJson(usersFile, EMPTY_USERS, (data) => {
-        assertUsersDocument(data);
-        if (data.usuarios.some((user) => user.tipo === "gestor")) {
-          return;
-        }
-
-        createdManager = {
-          id: nextId(data.usuarios),
-          nome: "Administrador ConnectClass",
-          ra: null,
-          email: "gestor@connectclass.local",
-          senhaHash,
-          tipo: "gestor",
-          turma: null,
-        };
-        data.usuarios.push(createdManager);
-      });
-
-      return createdManager ? publicUser(createdManager) : null;
+      const connection = await pool.getConnection();
+      let locked = false;
+      try {
+        const [[lock]] = await connection.execute("SELECT GET_LOCK(CONCAT('connectclass:manager:', DATABASE()), 10) AS acquired");
+        if (lock.acquired !== 1) throw new Error("Bootstrap ocupado.");
+        locked = true;
+        const [existing] = await connection.execute("SELECT id FROM users WHERE tipo = 'gestor' LIMIT 1");
+        if (existing.length) return null;
+        if (password === undefined) throw new Error("Configure CONNECTCLASS_GESTOR_PASSWORD para criar o primeiro gestor.");
+        const error = validatePassword(password);
+        if (error) throw new ValidationError({ senha: error });
+        const manager = {nome: "Administrador ConnectClass", ra: null, turma: null, email: "gestor@connectclass.local", tipo: "gestor"};
+        const [result] = await connection.execute(
+          "INSERT INTO users (nome, email, senha_hash, tipo, created_at, updated_at) VALUES (?, ?, ?, 'gestor', UTC_TIMESTAMP(3), UTC_TIMESTAMP(3))",
+          [manager.nome, manager.email, await hashPassword(password)]);
+        return publicUser({ ...manager, id: result.insertId });
+      } finally {
+        if (locked) await connection.execute("SELECT RELEASE_LOCK(CONCAT('connectclass:manager:', DATABASE()))").catch(() => {});
+        connection.release();
+      }
     },
   };
 }
@@ -132,12 +92,12 @@ export function publicUser(user) {
   };
 }
 
-function validateStudentInput(input) {
+export function validateStudentInput(input) {
   const errors = {};
-  const nome = String(input?.nome ?? "").trim();
-  const ra = String(input?.ra ?? "").trim();
-  const turma = String(input?.turma ?? "").trim();
-  const email = String(input?.email ?? "").trim();
+  const nome = typeof input?.nome === "string" ? input.nome.trim() : "";
+  const ra = typeof input?.ra === "string" ? input.ra.trim() : "";
+  const turma = typeof input?.turma === "string" ? input.turma.trim() : "";
+  const email = typeof input?.email === "string" ? input.email.trim() : "";
   const passwordError = validatePassword(input?.senha);
 
   if (!nome) errors.nome = "Informe seu nome completo.";
@@ -156,16 +116,6 @@ function validateStudentInput(input) {
   }
 
   return errors;
-}
-
-function assertUsersDocument(data) {
-  if (!data || !Array.isArray(data.usuarios)) {
-    throw new Error("O arquivo usuarios.json não possui a estrutura esperada.");
-  }
-}
-
-function nextId(users) {
-  return users.reduce((highest, user) => Math.max(highest, Number(user.id) || 0), 0) + 1;
 }
 
 function normalizeEmail(value) {

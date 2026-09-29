@@ -1,0 +1,111 @@
+/* Scoped to the administrative page: student styles remain untouched. */
+.manager-page .manager-sidebar { overflow-y: auto; }
+.manager-page .manager-profile > div:last-child { min-width: 0; flex: 1; }
+.manager-page .manager-profile strong { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.manager-page .manager-shell { display: flex; flex-direction: column; gap: 14px; padding: 0 24px 20px; }
+.manager-page .manager-header { margin: 0 -24px; flex: none; min-height: 88px; padding: 18px 24px; }
+.manager-page .manager-dashboard { grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 0; gap: 10px; }
+.manager-page .metric-card { min-height: 80px; padding: 12px 16px; }
+.manager-page .metric-card strong { margin-top: 5px; font-size: 26px; }
+.manager-search-area { flex: none; padding: 14px; border: 1px solid #e4e7ec; border-radius: 14px; background: white; }
+.manager-search-area summary { cursor: pointer; color: #344054; font-size: 13px; font-weight: 600; padding-top: 12px; }
+.manager-search-area summary:focus-visible { outline: 3px solid #93b4fb; outline-offset: 3px; }
+.manager-page .manager-filters { grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 12px 0 0; border: 0; box-shadow: none; gap: 10px; }
+.manager-date-hint { margin: 0; color: #667085; font-size: 11px; align-self: center; }
+.manager-page .manager-messages { grid-template-columns: minmax(270px, .82fr) minmax(0, 1.35fr); min-height: 550px; flex: 1; margin-top: 0; gap: 14px; }
+.manager-page .manager-list-panel, .manager-page .manager-detail-panel { min-height: 0; }
+.manager-page .manager-detail-panel { overflow-y: auto; }
+.manager-page .manager-conversation-list { display: block; flex: 1; max-height: 720px; }
+.manager-page .conversation-item { display: flex; align-items: flex-start; gap: 10px; padding: 13px; }
+.conversation-avatar { display: grid; width: 36px; height: 36px; flex: none; place-items: center; color: #2453b8; background: #e8efff; border-radius: 50%; font-size: 12px; font-weight: 700; }
+.conversation-summary { flex: 1; min-width: 0; }
+.manager-page .conversation-item__top { gap: 8px; }
+.manager-page .conversation-item__top time { color: #667085; }
+.manager-page .conversation-item__identity { font-size: 10px; margin-top: 3px; }
+.manager-page .conversation-item__message { font-size: 13px; line-height: 1.5; }
+.manager-page .conversation-item__meta { gap: 6px; margin-top: 6px; flex-wrap: wrap; font-size: 11px; }
+.manager-page .conversation-item__meta .message-status { min-height: 20px; padding: 1px 6px; font-size: 10px; }
+.manager-page .manager-message-history { min-height: 100px; max-height: 620px; padding: 18px; }
+.manager-page .message-group { width: min(88%, 660px); }
+.manager-page .message-bubble { font-size: 14px; line-height: 1.55; padding: 11px 15px; }
+.manager-page .manager-detail-header p { overflow-wrap: anywhere; }
+.manager-actions { flex: none; min-width: 0; padding: 14px 18px; border-top: 1px solid #e4e7ec; background: white; }
+.manager-action-label { display: block; color: #475467; font-size: 12px; font-weight: 600; margin-bottom: 5px; }
+.manager-action-input { width: 100%; max-width: 100%; min-width: 0; padding: 8px 10px; color: #344054; border: 1px solid #d0d5dd; border-radius: 9px; background: white; font: inherit; font-size: 13px; }
+.manager-action-input:focus-visible { outline: 3px solid #93b4fb; outline-offset: 1px; }
+.manager-target-preview { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #667085; font-size: 11px; margin: 5px 0 10px; }
+.manager-status-form { display: grid; grid-template-columns: 1fr auto; gap: 5px 8px; margin-bottom: 12px; }
+.manager-status-form label { grid-column: 1 / -1; margin: 0; }
+.manager-reply-form textarea { display: block; min-height: 70px; max-height: 160px; resize: vertical; }
+.manager-reply-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; }
+.manager-character-count { color: #667085; font-size: 11px; }
+.manager-primary-button, .manager-secondary-button { min-height: 38px; padding: 8px 12px; border: 1px solid #bfd0fa; border-radius: 9px; font: inherit; font-size: 13px; font-weight: 600; }
+.manager-primary-button { color: white; background: #1d4ed8; border-color: #1d4ed8; }
+.manager-secondary-button { color: #174cda; background: #f5f8ff; }
+.manager-primary-button:hover { background: #193fad; }
+.manager-secondary-button:hover { background: #e7efff; }
+.manager-page button:disabled { cursor: wait; opacity: .6; }
+.manager-feedback { flex: none; margin: 0; padding: 10px 14px; border-radius: 9px; background: #eafbf0; color: #17633f; font-size: 13px; }
+.manager-feedback.is-error { background: #fef3f2; color: #b42318; }
+.manager-page .manager-state { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; flex: 1; }
+.manager-state p { margin: 0; }
+.manager-session-checking .manager-messages, .manager-session-checking .manager-dashboard { visibility: hidden; }
+
+@media (min-width: 901px) {
+  .manager-page .manager-shell:has(.manager-dashboard[hidden]) { overflow: hidden; }
+  .manager-page .manager-shell:has(.manager-dashboard[hidden]) .manager-messages { min-height: 0; }
+}
+
+@media (min-width: 1201px) {
+  .manager-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 5px 12px; }
+  .manager-actions > .manager-action-label { grid-column: 1; grid-row: 1; margin-bottom: 0; }
+  .manager-actions > select { grid-column: 1; grid-row: 2; }
+  .manager-actions > .manager-target-preview { display: none; }
+  .manager-actions > .manager-status-form { grid-column: 2; grid-row: 1 / span 2; margin: 0; }
+  .manager-actions > .manager-reply-form { grid-column: 1 / -1; margin-top: 8px; }
+}
+
+@media (max-width: 1200px) and (min-width: 901px) {
+  .manager-page .manager-sidebar { width: 240px; min-width: 240px; }
+  .manager-page .manager-shell { padding-right: 16px; padding-left: 16px; }
+  .manager-page .manager-header { margin-right: -16px; margin-left: -16px; padding-right: 16px; padding-left: 16px; }
+  .manager-page .manager-messages { grid-template-columns: minmax(240px, .75fr) minmax(0, 1.1fr); }
+}
+
+@media (max-width: 900px) {
+  .manager-page .manager-shell { padding: 0 16px 16px; gap: 12px; }
+  .manager-page .manager-header { margin: 0 -16px; padding: 16px 16px 16px 66px; min-height: 82px; }
+  .manager-page .manager-sidebar { z-index: 5; }
+  .manager-page .manager-mobile-menu { z-index: 6; }
+  .manager-page .sidebar-overlay { position: fixed; inset: 0; z-index: 4; background: #1018287a; }
+  .manager-page .sidebar-overlay.is-open { display: block; }
+  .manager-page .manager-sidebar .sidebar-brand { padding-left: 68px; }
+  .manager-page .manager-dashboard { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .manager-page .manager-messages { grid-template-columns: 1fr; min-height: 360px; }
+  .manager-page:not(.manager-conversation-open) .manager-detail-panel { display: none; }
+  .manager-conversation-open .manager-list-panel { display: none; }
+  .manager-conversation-open .manager-search-area, .manager-conversation-open .manager-dashboard { display: none; }
+  .manager-page.manager-conversation-open .manager-shell { overflow: hidden; }
+  .manager-page.manager-conversation-open .manager-messages { min-height: 0; }
+  .manager-page.manager-conversation-open .manager-message-history { min-height: 0; }
+  .manager-page .manager-back-button { display: inline-flex; }
+}
+
+@media (max-width: 600px) {
+  .manager-page .manager-dashboard { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .manager-page .manager-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .manager-date-hint { grid-column: 1 / -1; }
+  .manager-page .manager-header p { display: none; }
+  .manager-page .manager-header h2 { font-size: 17px; }
+  .manager-page .manager-header { gap: 8px; }
+  .manager-page .manager-refresh { font-size: 12px; padding: 0 10px; }
+  .manager-page .manager-detail-header { padding: 10px 14px; }
+  .manager-page .manager-detail-header h3 { font-size: 15px; }
+  .manager-page .manager-message-history { padding: 12px; }
+  .manager-actions { padding: 10px 12px; }
+  .manager-action-label { font-size: 11px; }
+  .manager-status-form { margin-bottom: 8px; }
+  .manager-page .manager-target-preview { display: none; }
+  .manager-page .manager-status-form { margin-top: 8px; }
+  .manager-reply-form textarea { min-height: 60px; max-height: 100px; }
+}
