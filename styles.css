@@ -1262,7 +1262,7 @@ button:active {
 
 /* Escurece só o fundo; preserva texto, hover, foco, tamanho e posição. */
 .send-button--has-text:not(:disabled) {
-  box-shadow: inset 0 0 0 100px rgba(0, 0, 0, 0.18), 0 4px 8px rgba(59, 105, 211, 0.22);
+  box-shadow: inset 0 0 0 100px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(59, 105, 211, 0.22);
 }
 
 @media (prefers-reduced-motion: reduce) {
