@@ -3,6 +3,8 @@ import { hashPassword, validatePassword, verifyPassword } from "./passwords.js";
 
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Not a password/hash: a disabled account keeps its ID and historical replies.
+export const DISABLED_ACCOUNT_HASH = "!disabled!";
 
 export class ValidationError extends Error {
   constructor(details) {
@@ -49,7 +51,7 @@ export function createUserRepository(pool) {
       return user && await verifyPassword(password, user.senhaHash) ? user : null;
     },
     async findById(id) {
-      const [rows] = await pool.execute("SELECT " + USER_COLUMNS + " FROM users WHERE id = ?", [id]);
+      const [rows] = await pool.execute("SELECT " + USER_COLUMNS + " FROM users WHERE id = ? AND senha_hash <> ?", [id, DISABLED_ACCOUNT_HASH]);
       return rows[0] ?? null;
     },
     async listStudents() {
@@ -63,7 +65,7 @@ export function createUserRepository(pool) {
         const [[lock]] = await connection.execute("SELECT GET_LOCK(CONCAT('connectclass:manager:', DATABASE()), 10) AS acquired");
         if (lock.acquired !== 1) throw new Error("Bootstrap ocupado.");
         locked = true;
-        const [existing] = await connection.execute("SELECT id FROM users WHERE tipo = 'gestor' LIMIT 1");
+        const [existing] = await connection.execute("SELECT id FROM users WHERE tipo = 'gestor' AND senha_hash <> ? LIMIT 1", [DISABLED_ACCOUNT_HASH]);
         if (existing.length) return null;
         if (password === undefined) throw new Error("Configure CONNECTCLASS_GESTOR_PASSWORD para criar o primeiro gestor.");
         const error = validatePassword(password);

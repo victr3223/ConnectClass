@@ -449,7 +449,10 @@ async function handleMessageSubmit(event) {
 }
 
 function updateSendButton() {
-  elements.sendButton.disabled = state.sending || !elements.messageInput.value.trim();
+  const length = elements.messageInput.value.trim().length;
+  const valid = length > 0 && length <= 1000;
+  elements.sendButton.classList.toggle("send-button--has-text", valid);
+  elements.sendButton.disabled = state.sending || !valid;
 }
 
 function messagePlaceholder(categoryId) {
@@ -603,7 +606,7 @@ function setFormBusy(form, busy) {
 function setMessageFormBusy(busy) {
   state.sending = busy;
   elements.messageInput.disabled = busy;
-  elements.sendButton.disabled = busy || !elements.messageInput.value.trim();
+  updateSendButton();
 }
 
 function debounce(callback, wait) {

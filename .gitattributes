@@ -1,0 +1,2 @@
+# MySQL executes this on Linux even when cloned on Windows.
+docker/**/*.sh text eol=lf

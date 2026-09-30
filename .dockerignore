@@ -1,0 +1,22 @@
+# Allowlist: private configuration, Git, data, backups and dependencies never enter the build context.
+**
+!Dockerfile
+!package.json
+!package-lock.json
+!server.js
+!index.html
+!gestor.html
+!styles.css
+!manager.css
+!script.js
+!gestor.js
+!message-ui.js
+!Captura de tela de 2026-06-07 23-06-40.png
+!assets/
+!assets/logo.png
+!server/
+!server/**
+!scripts/
+!scripts/*.js
+!database/
+!database/schema.sql

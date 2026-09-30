@@ -6,9 +6,10 @@ export async function acquireTestDatabase({ reset = true } = {}) {
   const config = databaseConfig();
   if (config.database !== "connectclass_final_test") throw new Error("Testes recusados: DB_NAME deve ser exatamente connectclass_final_test.");
   const pool = createDatabasePool(config);
-  const guard = await pool.getConnection();
+  let guard;
   let locked = false;
   try {
+    guard = await pool.getConnection();
     const [[row]] = await guard.execute("SELECT DATABASE() AS db, GET_LOCK('connectclass_final:test-fixture', 30) AS acquired");
     locked = row.acquired === 1;
     if (row.db !== "connectclass_final_test" || !locked) throw new Error("Banco de testes indisponível ou incorreto.");
@@ -29,6 +30,6 @@ export async function acquireTestDatabase({ reset = true } = {}) {
     } };
   } catch (error) {
     if (locked) await guard.execute("SELECT RELEASE_LOCK('connectclass_final:test-fixture')").catch(()=>{});
-    guard.release(); await pool.end(); throw error;
+    guard?.release(); await pool.end(); throw error;
   }
 }

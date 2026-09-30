@@ -2,7 +2,134 @@
 
 Plataforma escolar de comunicação entre alunos e secretaria, com Node.js, MySQL e HTML/CSS/JavaScript. **A versão oficial, originada da `tcc-final`, está na raiz deste repositório.** Não use a versão histórica `tcc1`. Visual, logo e controladores de interface preservados.
 
-## Instalação e execução local
+## Docker Compose (app + MySQL 8.4)
+
+Requisitos: Docker Engine em execução e Docker Compose v2.20+ (ou v5). Windows: Docker Desktop com Linux containers/WSL 2. Ubuntu/VPS: siga a [instalação oficial do Docker](https://docs.docker.com/engine/install/ubuntu/) e inclua o plugin Compose. Confirme `docker info` e `docker compose version`.
+
+Na raiz do projeto:
+
+```sh
+# Uma única vez, antes de criar o volume (Node 22+ instalado no host):
+npm run docker:configure
+docker compose build
+docker compose up -d --wait
+docker compose ps
+```
+
+Se o servidor tiver somente Docker, gere a configuração sem instalar Node no host (Ubuntu):
+
+```sh
+docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/workspace" -w /workspace node:22-bookworm-slim node scripts/setup-docker-env.js
+docker compose build
+docker compose up -d --wait
+```
+
+Abra [ConnectClass Docker local](http://127.0.0.1:8081). O gestor inicial é `gestor@connectclass.local`; consulte **privadamente** o valor de `CONNECTCLASS_GESTOR_PASSWORD` em `.env.docker.app`. Nunca copie esse valor para chat, logs ou Git. Não há senha fixa/demonstrativa de acesso.
+
+### Configuração privada e isolamento
+
+`docker:configure` cria `.env.docker.app` e `.env.docker.mysql` com segredos aleatórios e distintos. Não imprime valores e recusa sobrescrever arquivos existentes. Os dois arquivos são ignorados pelo Git e excluídos da imagem. **O `.env` nativo e os bancos MySQL locais não são alterados.** O Docker inicia outra base, vazia; não copia automaticamente seus dados reais.
+
+- `.env.docker.app`: `DB_USER`, `DB_PASSWORD`, `DB_MIGRATION_USER`, `DB_MIGRATION_PASSWORD`, `CONNECTCLASS_GESTOR_PASSWORD`. Não recebe a senha root do MySQL.
+- `.env.docker.mysql`: `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD`, `DB_MIGRATION_PASSWORD`. Usuário/senha da aplicação e senha da migração precisam corresponder ao primeiro arquivo.
+- O Compose fixa `DB_HOST=mysql`, `DB_PORT=3306`, `DB_NAME=connectclass`, `HOST=0.0.0.0`. `PORT` vem do ambiente (padrão 8081). MySQL não publica porta no host, e usa rede Docker interna.
+- `APP_PORT` escolhe a porta no host; `APP_BIND` é `127.0.0.1` por padrão. `APP_NODE_ENV` é `development` para permitir o teste local HTTP. Essas opções não secretas podem ficar no `.env` ou no ambiente do terminal.
+- A imagem executa como usuário não root, com filesystem somente leitura e `/tmp` temporário. `.dockerignore` usa lista de arquivos permitidos: sem `.env`, dados legados, backups, `.git` ou node_modules do host.
+
+Não regenere senhas após inicializar o volume: variáveis da imagem MySQL criam contas **somente na primeira inicialização**; editar arquivos não altera contas existentes. Preserve as configurações junto de um backup privado. Se perdê-las, recupere-as; nunca apague o volume para contornar um erro de acesso. Use nomes de usuário da aplicação com letras, números e `_`, até 32 caracteres; não use root ou connectclass_migrator.
+
+### Schema automático, healthchecks e persistência
+
+O volume nomeado `mysql_data` é montado em `/var/lib/mysql` (nome padrão no host: `connectclass_mysql_data`). Na primeira inicialização, o MySQL cria o banco e as contas; o script `docker/mysql/01-accounts.sh` restringe a conta web a SELECT/INSERT/UPDATE/DELETE e cria a conta de migração com privilégios DDL limitados ao mesmo banco.
+
+O app espera o healthcheck SQL do MySQL. Seu entrypoint tenta novamente falhas transitórias de conexão, adquire um lock e aplica o schema v1 idempotentemente antes de iniciar HTTP. Recusa versões futuras/incompatíveis, não executa DROP/TRUNCATE/limpeza de dados e encerra em falha. Credenciais de migração são retiradas do ambiente do processo HTTP após uso. Não há dependência do Workbench. Mudanças futuras de schema precisam ser versionadas/testadas; DDL MySQL não tem rollback transacional geral.
+
+O healthcheck do app verifica HTTP **e MySQL/schema**. A rota `/health` isoladamente continua sendo liveness. Uma indisponibilidade posterior do banco torna o app unhealthy, sem apagar dados. Restart/recriação encerra sessões em memória: entre novamente; usuários, atendimentos, respostas e status ficam no volume. Runtime não persiste dados em JSON.
+
+### Substituir o gestor com segurança
+
+A troca preserva o ID e as respostas do gestor antigo, desativando sua autenticação e sessões. Usa o mesmo scrypt da aplicação e prepared statements. Cria/confere o novo gestor, testa login e Dashboard HTTP e só então desativa o antigo. Falhas anteriores preservam a conta antiga; falha na confirmação posterior recupera a alteração exata. Repetir com a mesma conta/senha não redefine senhas nem duplica usuários. Não remova a conta antiga por SQL se ela possuir respostas.
+
+No Windows, após o build e o app saudável, execute na raiz:
+
+```powershell
+.\scripts\replace-manager.ps1
+```
+
+O script pede os e-mails e a senha com entrada oculta. A senha segue pela entrada padrão privada do processo no container, sem arquivo, argumento de comando ou configuração persistente do Docker. Não digite a senha na linha de comando e não ative transcrições/captura de entrada nessa operação. Não envie a senha no chat.
+
+Outra opção é injetar `NEW_MANAGER_EMAIL`, `NEW_MANAGER_PASSWORD` e `OLD_MANAGER_EMAIL` temporariamente no processo do container e executar `node scripts/replace-manager.js`. O script consome/remove essas variáveis; não as adicione ao Compose, `.env.example`, Git ou README com valores. A execução direta fora do banco do Compose é recusada. O retorno mostra apenas confirmações, sem senha/e-mails/hashes.
+
+### Comandos de operação
+
+```sh
+docker compose ps
+docker compose logs --tail=100 app mysql
+docker compose logs -f app
+docker compose restart
+docker compose stop
+docker compose start
+# Remove os containers/rede, mas mantém o volume:
+docker compose down
+docker compose up -d --wait
+# Após atualizar o código:
+docker compose build
+docker compose up -d --wait
+# Recriar somente o app, sem tocar no MySQL:
+docker compose up -d --no-deps --force-recreate --wait app
+```
+
+**Não use `down -v`, `docker volume rm`, prune ou limpeza/reset do Docker Desktop** se houver dados a preservar. Não publique a saída de `docker compose config` sem `--quiet` nem `docker inspect` completo: podem conter credenciais resolvidas. Para validar configuração sem exibir segredos, use `docker compose config --quiet`.
+
+### Backup MySQL e volume (Ubuntu/VPS)
+
+Prefira um dump lógico consistente. Este comando grava o conteúdo privado dentro do container e o copia para uma pasta ignorada, sem colocar a senha na linha de comando:
+
+```sh
+mkdir -p backups
+docker compose exec -T mysql sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysqldump -u root --single-transaction --routines --triggers --events --no-tablespaces --set-gtid-purged=OFF --databases connectclass > /tmp/connectclass-backup.sql'
+docker compose cp mysql:/tmp/connectclass-backup.sql ./backups/connectclass-backup.sql
+chmod 600 ./backups/connectclass-backup.sql
+```
+
+Use nomes datados para preservar backups anteriores. O dump contém dados pessoais e hashes: armazene criptografado/privadamente, fora do Git, junto das configurações necessárias à recuperação. Não cole seu conteúdo em tickets/chat.
+
+Para uma cópia física do volume, **pare app e MySQL antes**, confirme o nome real (pode mudar com `-p`) e use um arquivo novo:
+
+```sh
+docker compose stop app mysql
+docker volume inspect connectclass_mysql_data --format '{{.Name}}'
+docker run --rm --mount type=volume,source=connectclass_mysql_data,target=/volume,readonly --mount type=bind,source="$PWD/backups",target=/backup alpine:3.23 sh -c 'umask 077; tar -czf /backup/mysql-volume-$(date +%Y%m%d-%H%M%S).tar.gz -C /volume .'
+docker compose up -d --wait
+```
+
+Não faça cópia física de um MySQL em execução. Teste a restauração em outro projeto/volume antes de depender do backup; nunca restaure por cima da base ativa. A restauração física exige versão compatível do MySQL e as mesmas credenciais. A documentação de backup não significa que uma restauração dos seus dados reais foi executada.
+
+### Ubuntu/VPS e HTTPS (nenhum deploy executado)
+
+Clone o repositório na VPS, prepare os arquivos privados **novos para esse ambiente**, gere a imagem e suba com os comandos acima. Não envie o `.env` nem o volume local para o Git. Use uma única instância do app, pois sessões/limites ficam em memória.
+
+Configure `APP_NODE_ENV=production`, mantenha `APP_BIND=127.0.0.1` e coloque Nginx/Caddy ou o proxy da hospedagem com HTTPS na frente de `127.0.0.1:8081`. Preserve o cabeçalho `Host` público. Libere apenas SSH e HTTP/HTTPS necessários no firewall; nunca exponha 3306. Não use cookies Secure de produção sobre HTTP. Se mudar `PORT`, Compose e healthcheck usam a mesma porta interna; `APP_PORT` controla a porta externa. Defina backups, monitoramento e atualização de imagens. Domínio, certificado, capacidade e conectividade da VPS só serão validados em um deploy autorizado.
+
+Portas publicadas pelo Docker podem contornar regras de UFW; mantenha o bind local e configure a filtragem Docker conforme a documentação oficial. O serviço MySQL não possui publicação de portas.
+
+### Testes Docker
+
+```sh
+docker compose build
+npm run test:docker
+npm run verify
+npm run test:coverage
+git diff --check
+```
+
+`test:docker` cria um projeto/volume de teste com nome único e senhas aleatórias, testa o fluxo HTTP real, privilégios, imagem sem dados JSON/segredos, restart, recriação do app e down/up. Ao final remove apenas os containers/rede de teste; **mantém o volume e a configuração privada em backups** para recuperação. Nunca opera sobre o volume principal nem sobre o MySQL nativo. Testes existentes continuam usando somente `connectclass_final_test`. E2E é HTTP; não certifica renderização visual.
+
+Resultados e limites da validação local: [relatório Docker](docs/docker-validation.md).
+
+Referências: [ordem de inicialização Compose](https://docs.docker.com/compose/how-tos/startup-order/) e [imagem MySQL oficial](https://hub.docker.com/_/mysql).
+
+## Instalação e execução local sem Docker
 
 Requisitos: Node.js 22+ e MySQL 8.4+ (validado localmente com MySQL 9.7.1). Não há build. Execute os comandos na **raiz**, onde fica `package.json`:
 
