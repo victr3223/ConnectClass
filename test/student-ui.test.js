@@ -46,6 +46,6 @@ test("botão: fundo ativo escuro sem filtro sobre texto/ícone, geometria ou fun
   const active=styles.match(/\.send-button--has-text:not\(:disabled\)\s*\{([^}]+)\}/)[1];
   assert.match(initial,/background:\s*linear-gradient\(105deg, #6e9df6, #8199ec\)/);
   assert.match(initial,/color:\s*var\(--white\)/);assert.match(initial,/box-shadow 150ms ease/);
-  assert.match(active,/inset 0 0 0 100px rgba\(0, 0, 0, 0\.4\)/);
+  assert.match(active,/inset 0 0 0 100px #2D358F/);
   assert.doesNotMatch(active,/(?:filter|color|width|height|padding|margin|position|transform|background)\s*:/);
 });
