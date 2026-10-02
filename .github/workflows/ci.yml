@@ -51,3 +51,6 @@ jobs:
           DB_NAME: connectclass_final_test
           DB_USER: connectclass_final_test
           DB_PASSWORD: ci-app-fixture-only
+      - name: Build deployable Docker image without host dependencies or private files
+        if: matrix.node == 22
+        run: docker build --tag connectclass-ci:${{ github.sha }} .

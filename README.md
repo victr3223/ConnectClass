@@ -6,7 +6,14 @@ Plataforma escolar de comunicação entre alunos e secretaria, com Node.js, MySQ
 
 Requisitos: Docker Engine em execução e Docker Compose v2.20+ (ou v5). Windows: Docker Desktop com Linux containers/WSL 2. Ubuntu/VPS: siga a [instalação oficial do Docker](https://docs.docker.com/engine/install/ubuntu/) e inclua o plugin Compose. Confirme `docker info` e `docker compose version`.
 
-Na raiz do projeto:
+Em uma instalação nova, clone o repositório autorizado e entre na raiz:
+
+```sh
+git clone https://github.com/victr3223/ConnectClass.git
+cd ConnectClass
+```
+
+O repositório é privado: use sua autenticação GitHub, sem colocar tokens na URL ou no código. Não copie dados/configurações de outra instalação nem inicialize novamente um volume existente. Na raiz do projeto:
 
 ```sh
 # Uma única vez, antes de criar o volume (Node 22+ instalado no host):
@@ -29,6 +36,8 @@ Abra [ConnectClass Docker local](http://127.0.0.1:8081). O gestor inicial é `ge
 ### Configuração privada e isolamento
 
 `docker:configure` cria `.env.docker.app` e `.env.docker.mysql` com segredos aleatórios e distintos. Não imprime valores e recusa sobrescrever arquivos existentes. Os dois arquivos são ignorados pelo Git e excluídos da imagem. **O `.env` nativo e os bancos MySQL locais não são alterados.** O Docker inicia outra base, vazia; não copia automaticamente seus dados reais.
+
+Copiar `.env.example` para `.env` configura apenas o modo nativo; não substitui os dois arquivos privados do Docker. No clone novo, o gerador acima cria tudo que o Compose precisa, inclusive sem Node/MySQL/Workbench instalados no host. Em atualizações, preserve os arquivos existentes e o volume, depois execute somente build/up.
 
 - `.env.docker.app`: `DB_USER`, `DB_PASSWORD`, `DB_MIGRATION_USER`, `DB_MIGRATION_PASSWORD`, `CONNECTCLASS_GESTOR_PASSWORD`. Não recebe a senha root do MySQL.
 - `.env.docker.mysql`: `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD`, `DB_MIGRATION_PASSWORD`. Usuário/senha da aplicação e senha da migração precisam corresponder ao primeiro arquivo.
