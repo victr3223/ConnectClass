@@ -2,6 +2,7 @@
 import mysql from "mysql2/promise";
 import { databaseConfig, safeDatabaseError } from "../server/database/connection.js";
 import { initializeSchema } from "../server/database/migrations.js";
+import { initializeServerlessSchema } from "../server/database/serverless-auth.js";
 
 let connection;
 try {
@@ -13,6 +14,7 @@ try {
   connection = await mysql.createConnection(adminConfig);
   for (const database of ["connectclass_final", "connectclass_final_test"]) {
     await initializeSchema(connection, database, { createDatabase: true });
+    await initializeServerlessSchema(connection);
   }
   await connection.query("CREATE USER 'connectclass_final_test'@'%' IDENTIFIED BY ?", [process.env.CI_DB_PASSWORD]);
   await connection.query("GRANT SELECT, INSERT, UPDATE, DELETE ON connectclass_final_test.* TO 'connectclass_final_test'@'%'");

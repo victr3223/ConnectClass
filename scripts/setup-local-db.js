@@ -4,6 +4,7 @@ import { access, writeFile } from "node:fs/promises";
 import mysql from "mysql2/promise";
 import { databaseConfig, safeDatabaseError } from "../server/database/connection.js";
 import { initializeSchema } from "../server/database/migrations.js";
+import { initializeServerlessSchema } from "../server/database/serverless-auth.js";
 
 let connection;
 try {
@@ -20,6 +21,7 @@ try {
   if (existing.length) throw new Error("Conta já existe: não redefinir credenciais.");
   for (const [database, user, file] of [["connectclass_final", "connectclass_final_app", ".env"], ["connectclass_final_test", "connectclass_final_test", ".env.test"]]) {
     await initializeSchema(connection, database, { createDatabase: true });
+    await initializeServerlessSchema(connection);
     const secret = randomBytes(32).toString("base64url");
     // Account-management DDL doesn't accept prepared markers for all grammar positions.
     // mysql2.query placeholders escape values, and identifiers here come ONLY from the fixed list above.

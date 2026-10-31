@@ -7,6 +7,7 @@ import { createUserRepository, ConflictError, publicUser, ValidationError } from
 import { createSessionStore, readCookies, serializeSessionCookie, SESSION_COOKIE } from "./sessions.js";
 import { createDatabasePool, databaseConfig, safeDatabaseError } from "./database/connection.js";
 import { verifySchema } from "./database/migrations.js";
+import { createMysqlSessionStore, createMysqlAuthLimiter, verifyServerlessSchema } from "./database/serverless-auth.js";
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 const defaultPublicDirectory = join(moduleDirectory, "..");
@@ -32,17 +33,23 @@ export async function createConnectClassApp(options = {}) {
   if (options.dataDirectory !== undefined) throw new Error("Persistência JSON desativada. Configure MySQL.");
   const isProduction = options.isProduction ?? process.env.NODE_ENV === "production";
   const logger = options.logger ?? console;
-  const pool = createDatabasePool(options.database ?? databaseConfig());
+  const pool = createDatabasePool(options.database ?? databaseConfig(),
+    { connectionLimit: options.poolLimit, idleTimeout: options.poolIdleTimeoutMs });
   const users = createUserRepository(pool);
   const messages = createMessageRepository(pool);
-  const sessions = createSessionStore({
+  const sessionOptions = {
     regularTtlMs: options.regularSessionTtlMs ?? REGULAR_SESSION_TTL,
     rememberedTtlMs: options.rememberedSessionTtlMs ?? REMEMBERED_SESSION_TTL,
-  });
+  };
+  const sessions = options.durableAuth ? createMysqlSessionStore(pool, sessionOptions) : createSessionStore(sessionOptions);
   const authLimiter = createAuthLimiter(options.authRateLimit ?? 30, options.authRateWindowMs ?? 60_000);
+  if (options.durableAuth) authLimiter.consume = createMysqlAuthLimiter(pool,
+    { limit: options.authRateLimit ?? 30, windowMs: authLimiter.windowMs }).consume;
 
   try {
+  options.onPoolCreated?.(pool);
   await verifySchema(pool);
+  if (options.durableAuth) await verifyServerlessSchema(pool);
   await users.initialize();
   await messages.initialize();
 
@@ -54,17 +61,19 @@ export async function createConnectClassApp(options = {}) {
   }
   } catch (error) { await pool.end(); throw error; }
 
-  const server = createServer({ headersTimeout: 10_000, requestTimeout: 20_000, connectionsCheckingInterval: 1_000 }, async (request, response) => {
+  const handler = async (request, response) => {
     try {
-      await handleRequest({ request, response, users, messages, sessions, authLimiter, publicDirectory, isProduction, bodyTimeoutMs: options.bodyTimeoutMs ?? 10_000 });
+      await handleRequest({ request, response, users, messages, sessions, authLimiter, publicDirectory, isProduction,
+        clientAddress: options.clientAddress, pool, bodyTimeoutMs: options.bodyTimeoutMs ?? 10_000 });
     } catch (error) {
       logger.error?.("[ConnectClass] Erro inesperado:", safeDatabaseError(error));
       sendJson(response, 500, { message: "Não foi possível concluir a operação. Tente novamente." });
     }
-  });
+  };
+  const server = createServer({ headersTimeout: 10_000, requestTimeout: 20_000, connectionsCheckingInterval: 1_000 }, handler);
 
   let closed = false;
-  return { server, pool, async close() {
+  return { handler, server, pool, async close() {
     if (closed) return;
     closed = true;
     if (server.listening) await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
@@ -78,6 +87,7 @@ async function handleRequest(context) {
   applySecurityHeaders(response);
 
   if (request.method === "GET" && url.pathname === "/health") {
+    await context.pool.execute("SELECT 1");
     return sendJson(response, 200, { status: "ok" });
   }
 
@@ -93,7 +103,7 @@ async function handleRequest(context) {
     if (!hasAllowedOrigin(request, context.isProduction)) {
       return sendJson(response, 403, { message: "Origem da requisição não permitida." });
     }
-    context.sessions.destroy(readCookies(request.headers.cookie)[SESSION_COOKIE]);
+    await context.sessions.destroy(readCookies(request.headers.cookie)[SESSION_COOKIE]);
     response.setHeader("Set-Cookie", serializeSessionCookie("", 0, context.isProduction));
     return sendJson(response, 200, { message: "Sessão encerrada." });
   }
@@ -231,7 +241,7 @@ async function handleRegistration(context) {
     return sendJson(response, 403, { message: "Origem da requisição não permitida." });
   }
 
-  if (!allowAuthenticationAttempt(context)) return;
+  if (!await allowAuthenticationAttempt(context)) return;
   let reserved = false;
   try {
     const body = await readRequestBody(request, context.bodyTimeoutMs);
@@ -245,8 +255,8 @@ async function handleRegistration(context) {
       senha: body.senha,
       confirmacaoSenha: body.confirmacaoSenha,
     });
-    context.sessions.destroy(readCookies(request.headers.cookie)[SESSION_COOKIE]);
-    const session = context.sessions.create(user.id, false);
+    await context.sessions.destroy(readCookies(request.headers.cookie)[SESSION_COOKIE]);
+    const session = await context.sessions.create(user.id, false);
     response.setHeader("Set-Cookie", serializeSessionCookie(session.token, session.expiresAt, context.isProduction));
     return sendJson(response, 201, { user });
   } catch (error) {
@@ -262,7 +272,7 @@ async function handleLogin(context) {
     return sendJson(response, 403, { message: "Origem da requisição não permitida." });
   }
 
-  if (!allowAuthenticationAttempt(context)) return;
+  if (!await allowAuthenticationAttempt(context)) return;
   let reserved = false;
   try {
     const body = await readRequestBody(request, context.bodyTimeoutMs);
@@ -273,8 +283,8 @@ async function handleLogin(context) {
       return sendJson(response, 401, { message: "RA/e-mail ou senha inválidos." });
     }
 
-    context.sessions.destroy(readCookies(request.headers.cookie)[SESSION_COOKIE]);
-    const session = context.sessions.create(user.id, body.lembrarMe === true);
+    await context.sessions.destroy(readCookies(request.headers.cookie)[SESSION_COOKIE]);
+    const session = await context.sessions.create(user.id, body.lembrarMe === true);
     response.setHeader("Set-Cookie", serializeSessionCookie(session.token, session.expiresAt, context.isProduction));
     return sendJson(response, 200, { user: publicUser(user) });
   } catch (error) {
@@ -307,7 +317,7 @@ async function protectedPage(context, requiredType, file) {
 
 async function authenticatedUser({ request, users, sessions }) {
   const cookies = readCookies(request.headers.cookie);
-  const session = sessions.get(cookies[SESSION_COOKIE]);
+  const session = await sessions.get(cookies[SESSION_COOKIE]);
   if (!session) return null;
   return users.findById(session.userId);
 }
@@ -431,8 +441,9 @@ function readRequestBody(request, timeoutMs) {
   });
 }
 
-function allowAuthenticationAttempt(context) {
-  if (context.authLimiter.consume(context.request.socket.remoteAddress ?? "unknown")) return true;
+async function allowAuthenticationAttempt(context) {
+  const address = context.clientAddress?.(context.request) ?? context.request.socket.remoteAddress ?? "unknown";
+  if (await context.authLimiter.consume(address)) return true;
   return rejectAuthentication(context);
 }
 

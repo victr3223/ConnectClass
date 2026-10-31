@@ -6,7 +6,7 @@ import { spawnSync } from "node:child_process";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 // Only executable application sources; the archived design is not part of this app.
-const directories = [".", "server", "scripts", "test"];
+const directories = [".", "server", "scripts", "test", "api"];
 async function collect(directory) {
   const result = [];
   for (const entry of await readdir(resolve(root, directory), { withFileTypes: true })) {

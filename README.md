@@ -2,6 +2,12 @@
 
 Plataforma escolar de comunicação entre alunos e secretaria, com Node.js, MySQL e HTML/CSS/JavaScript. **A versão oficial, originada da `tcc-final`, está na raiz deste repositório.** Não use a versão histórica `tcc1`. Visual, logo e controladores de interface preservados.
 
+## Vercel + MySQL externo
+
+Produção oficial: **https://connect-class.vercel.app**. Homologação isolada: https://connectclass-staging.vercel.app. Consulte [a validação de produção](docs/production-validation.md) antes de operar ou atualizar esses ambientes.
+
+O adaptador `api/index.js` reutiliza o backend Node.js existente. Nesse ambiente, sessões e limite de login ficam no MySQL, com TLS, cookies Secure/HttpOnly e pool reutilizado de três conexões por instância. A execução Docker abaixo continua disponível. Consulte [configuração, migração, preview, testes, produção e rollback](docs/vercel.md). O diretório `media/comercial`, backups e arquivos privados são excluídos do deploy.
+
 ## Docker Compose (app + MySQL 8.4)
 
 Requisitos: Docker Engine em execução e Docker Compose v2.20+ (ou v5). Windows: Docker Desktop com Linux containers/WSL 2. Ubuntu/VPS: siga a [instalação oficial do Docker](https://docs.docker.com/engine/install/ubuntu/) e inclua o plugin Compose. Confirme `docker info` e `docker compose version`.
@@ -53,7 +59,7 @@ O volume nomeado `mysql_data` é montado em `/var/lib/mysql` (nome padrão no ho
 
 O app espera o healthcheck SQL do MySQL. Seu entrypoint tenta novamente falhas transitórias de conexão, adquire um lock e aplica o schema v1 idempotentemente antes de iniciar HTTP. Recusa versões futuras/incompatíveis, não executa DROP/TRUNCATE/limpeza de dados e encerra em falha. Credenciais de migração são retiradas do ambiente do processo HTTP após uso. Não há dependência do Workbench. Mudanças futuras de schema precisam ser versionadas/testadas; DDL MySQL não tem rollback transacional geral.
 
-O healthcheck do app verifica HTTP **e MySQL/schema**. A rota `/health` isoladamente continua sendo liveness. Uma indisponibilidade posterior do banco torna o app unhealthy, sem apagar dados. Restart/recriação encerra sessões em memória: entre novamente; usuários, atendimentos, respostas e status ficam no volume. Runtime não persiste dados em JSON.
+O healthcheck do app verifica HTTP **e MySQL/schema**. A rota `/health` também consulta o banco. Uma indisponibilidade posterior do banco torna o app unhealthy, sem apagar dados. No modo Docker atual, restart/recriação encerra sessões em memória: entre novamente; usuários, atendimentos, respostas e status ficam no volume. Na Vercel, as sessões persistem no MySQL. Runtime não persiste dados em JSON.
 
 ### Substituir o gestor com segurança
 

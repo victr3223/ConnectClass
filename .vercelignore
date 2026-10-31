@@ -1,0 +1,24 @@
+# Deploy source allowlist. Commercial, private files and local tools are excluded.
+**
+!package.json
+!package-lock.json
+!vercel.json
+!api
+!api/**
+!server
+!server/**
+!database
+!database/schema.sql
+!database/serverless.sql
+!scripts
+!scripts/build-vercel.js
+!index.html
+!gestor.html
+!styles.css
+!manager.css
+!script.js
+!gestor.js
+!message-ui.js
+!assets
+!assets/logo.png
+!Captura de tela de 2026-06-07 23-06-40.png

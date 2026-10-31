@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "node scripts/build-vercel.js",
+  "installCommand": "npm ci --ignore-scripts --omit=dev",
+  "outputDirectory": "public",
+  "fluid": true,
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30,
+      "includeFiles": "{index.html,gestor.html,styles.css,manager.css,script.js,gestor.js,message-ui.js,assets/logo.png,Captura de tela de 2026-06-07 23-06-40.png}",
+      "excludeFiles": "{media/**,backups/**,data/**,test/**,docs/**,.env*,database/private/**}"
+    }
+  },
+  "env": { "NODEJS_HELPERS": "0" },
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+}

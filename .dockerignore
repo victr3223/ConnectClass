@@ -20,3 +20,4 @@
 !scripts/*.js
 !database/
 !database/schema.sql
+!database/serverless.sql

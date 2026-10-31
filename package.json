@@ -10,12 +10,14 @@
     "start": "node server.js",
     "check": "node scripts/check.js",
     "test": "node scripts/run-tests.js",
-    "test:unit": "node --test test/server.unit.test.js test/manager-ui.test.js test/student-ui.test.js test/docker.unit.test.js",
-    "test:integration": "node --test --test-concurrency=1 test/auth.integration.test.js test/mysql.integration.test.js test/process.integration.test.js test/replace-manager.integration.test.js",
+    "test:unit": "node --test test/server.unit.test.js test/manager-ui.test.js test/student-ui.test.js test/docker.unit.test.js test/vercel.unit.test.js test/aiven.unit.test.js",
+    "test:integration": "node --test --test-concurrency=1 test/auth.integration.test.js test/mysql.integration.test.js test/process.integration.test.js test/replace-manager.integration.test.js test/serverless.integration.test.js test/cloud-transfer.integration.test.js test/aiven.recovery.integration.test.js",
     "test:e2e:http": "node --test test/process.integration.test.js",
     "test:coverage": "node scripts/run-tests.js --coverage",
     "verify": "npm run check && npm test",
     "db:init": "node --env-file=.env.mysql-admin scripts/init-db.js",
+    "build:vercel": "node scripts/build-vercel.js",
+    "db:migrate:vercel": "node scripts/migrate-vercel.js",
     "db:import": "node scripts/migrate-json-to-mysql.js",
     "db:verify-import": "node scripts/verify-migration.js",
     "db:setup-local": "node --env-file=.env.mysql-admin scripts/setup-local-db.js"
@@ -24,6 +26,10 @@
     "node": ">=22"
   },
   "dependencies": {
+    "@vercel/functions": "3.10.4",
     "mysql2": "3.24.4"
+  },
+  "overrides": {
+    "zod": "4.6.6"
   }
 }

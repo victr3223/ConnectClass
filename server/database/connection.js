@@ -23,9 +23,11 @@ export function databaseConfig(env = process.env, { admin = false } = {}) {
     connectTimeout: 5000, enableKeepAlive: true };
 }
 
-export function createDatabasePool(config = databaseConfig()) {
-  const pool = mysql.createPool({ ...config, waitForConnections: true, connectionLimit: 10,
-    maxIdle: 5, idleTimeout: 60000, queueLimit: 100 });
+export function createDatabasePool(config = databaseConfig(), { connectionLimit = 10, idleTimeout = 60000 } = {}) {
+  if (!Number.isInteger(connectionLimit) || connectionLimit < 1 || connectionLimit > 10) throw new Error("Limite do pool deve estar entre 1 e 10.");
+  const pool = mysql.createPool({ ...config, waitForConnections: true, connectionLimit,
+    // mysql2 only enables its idle cleanup timer when maxIdle < connectionLimit.
+    maxIdle: Math.min(5, connectionLimit - 1), idleTimeout, queueLimit: 100 });
   pool.on("connection", (connection) => {
     connection.query("SET SESSION time_zone = '+00:00', group_concat_max_len = 16777216");
   });
